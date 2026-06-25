@@ -1,103 +1,100 @@
-# SOC-Lab-Detection-Engineering
-Enterprise SOC Laboratory with Wazuh SIEM, Sysmon, and Kali Linux mapped to MITRE ATT&amp;CK.
+# 🛡️ Home SOC Lab - Threat Detection & Log Analysis
 
-# 🛡️ Enterprise SOC Laboratory & Detection Engineering Project
-
-## 📌 Project Overview
-This project demonstrates the design, deployment, and operation of a fully functional Security Operations Center (SOC) Home Laboratory. The objective was to build an isolated environment to simulate real-world cyberattacks (Red Team) and engineer high-fidelity detection mechanisms (Blue Team) using enterprise-grade telemetry sources, a central SIEM, and deep packet analysis.
-
-By mapping malicious activities to the **MITRE ATT&CK Framework**, this project showcases practical skills in log analysis, detection engineering, and incident investigation.
+Projekt stworzyłem w celu praktycznego przetestowania mechanizmów detekcji zagrożeń w odizolowanym środowisku sieciowym. Skupiłem się na analizie telemetrii systemowej, korelacji logów w systemie SIEM oraz inspekcji surowych pakietów sieciowych. Całość opiera się na symulacji realnych technik hakerskich i mapowaniu ich do matrycy MITRE ATT&CK.
 
 ---
 
-## 🏗️ Environment Architecture & Topology
-The laboratory is built inside an isolated host-only network (`10.0.2.0/24`) to guarantee complete safety during attack simulations.
+## 💻 Hardware & Host OS (Platforma sprzętowa)
+Całe laboratorium zostało uruchomione lokalnie na moim fizycznym komputerze. Odpowiednie zarządzanie zasobami było kluczowe, aby zapewnić stabilne działanie systemu SIEM oraz maszyn klienckich.
 
-*   **SIEM & Analytics:** Wazuh Manager v4.14.5 (Ubuntu-based Virtual Appliance) — `10.0.2.3`
-*   **Target (Victim):** Windows 10 Pro (Hardened Auditing with Microsoft Sysmon & SwiftOnSecurity configuration) — `10.0.2.4`
-*   **Attacker:** Kali Linux (Rolling edition) — `10.0.2.5`
-*   **Network Analysis Host:** Wireshark (Packet Capture & Protocol Analysis)
-*   ## 🛠️ Core Skills & Tools Showcased
-*   **SIEM/XDR:** Wazuh Dashboard management, custom DQL querying, alert triage.
-*   **Endpoint Detection:** Microsoft Sysmon deployment, Advanced Windows Security Auditing configuration, `ossec.conf` pipeline engineering.
-*   **Network Security:** Wireshark packet analysis, firewall profile management, PCAP analysis.
-*   **Frameworks:** MITRE ATT&CK mapping (Reconnaissance, Credential Access).
+* **System operacyjny hosta:** Windows 11 Pro [Zmień jeśli masz inny, np. Windows 10]
+* **Procesor (CPU):** [Wpisz swój procesor, np. Intel Core i5-11400F / AMD Ryzen 5]
+* **Pamięć RAM:** [Wpisz swój RAM, np. 16 GB / 32 GB]
+* **Dysk:** SSD NVMe
 
 ---
 
-## ⚔️ Case Study 1: SMB Reconnaissance & Brute-Force Attack
+## 💾 Oprogramowanie i Wirtualizacja (Software Stack)
+* **Hiperwzorzec:** Oracle VirtualBox (wersja 7.x) – posłużył do stworzenia izolowanej sieci typu Host-Only (`10.0.2.0/24`), całkowicie bezpiecznej dla systemu operacyjnego hosta.
+* **SIEM / XDR:** Wazuh Manager (Virtual Appliance oparty na Ubuntu) – `10.0.2.3` (Centralny punkt zbierania i analizy logów).
+* **Endpoint (Ofiara):** Windows 10 Pro – `10.0.2.4` (Zainstalowany agent Wazuh oraz sensor Microsoft Sysmon z konfiguracją SwiftOnSecurity).
+* **System Atakującego:** Kali Linux – `10.0.2.5` (Platforma do generowania ruchu i symulacji ataków).
+* **Analiza Sieciowa:** Wireshark – narzędzie do przechwytywania i analizy surowych pakietów (PCAP).
 
-### 1. Attack Phase (Red Team Tactics)
-Using the Kali Linux machine, an active port scan was executed to discover open services, followed by an automated SMB brute-force attack attempting to guess the Windows Administrator password.
+---
 
-*   **Reconnaissance Command (Nmap):**
+## ⚔️ Case Study 1: SMB Reconnaissance & Brute-Force
+
+### 1. Przebieg ataku (Red Team)
+Z poziomu maszyny Kali Linux przeprowadziłem szybkie skanowanie portów w poszukiwaniu otwartych usług, a następnie uruchomiłem próbę automatycznego logowania (brute-force) do usługi SMB na maszynie z systemem Windows, celując w lokalne konto Administratora.
+
+* **Skanowanie portów (Nmap):**
     ```bash
     nmap -F 10.0.2.4
     ```
-*   **Credential Access Command (SMB Brute Force):**
+* **Próba uwierzytelnienia SMB (SMBClient):**
     ```bash
     smbclient -L //10.0.2.4 -U administrator%BledneHaslo123!
     ```
 
-### 2. MITRE ATT&CK Mapping
-*   **Tactic:** Reconnaissance ([TA0043](https://attack.mitre.org/tactics/TA0043/)) -> **Technique:** Active Scanning ([T1595](https://attack.mitre.org/techniques/T1595/))
-*   **Tactic:** Credential Access ([TA0006](https://attack.mitre.org/tactics/TA0006/)) -> **Technique:** Brute Force ([T1110](https://attack.mitre.org/techniques/T1110/))
+### 2. Mapowanie do MITRE ATT&CK
+* **Taktyka:** Reconnaissance ([TA0043](https://attack.mitre.org/tactics/TA0043/)) $\rightarrow$ **Technika:** Active Scanning ([T1595](https://attack.mitre.org/techniques/T1595/))
+* **Taktyka:** Credential Access ([TA0006](https://attack.mitre.org/tactics/TA0006/)) $\rightarrow$ **Technika:** Brute Force ([T1110](https://attack.mitre.org/techniques/T1110/))
 
-### 3. Detection Engineering & Log Analysis (Blue Team)
-After fine-tuning the data ingestion pipeline (`ossec.conf`) on the Windows Agent to collect `Microsoft-Windows-Sysmon/Operational` event channels, the telemetry successfully reached the Wazuh SIEM.
+### 3. Detekcja i analiza logów (Blue Team)
 
-#### 🔴 Alert 1: Windows Security Event ID 4625 (Logon Failure)
-The SIEM successfully captured the failed authentication attempts generated by the `smbclient` attack.
-<img width="719" height="785" alt="wazuh-alert-4625" src="https://github.com/user-attachments/assets/c0955a8e-d576-4d74-b24a-acadb512e29d" />
+#### 🔴 Logi systemowe: Windows Security Event ID 4625
+Agent Wazuh pomyślnie przechwycił i przesłał do bazy log dotyczący nieudanego uwierzytelnienia. W procesie analizy kluczowe były następujące zmienne:
+* **Logon Type:** `3` (Network Logon) – potwierdza, że próba logowania nastąpiła przez sieć, a nie lokalnie z konsoli.
+* **Source IP:** `10.0.2.5` – wskazuje bezpośrednio na maszynę Kali Linux jako źródło ataku.
+* **Target Account:** `administrator`
 
+<p align="center">
+  <img src="wazuh-event-4625-logon-failure.png" width="75%" alt="Wazuh Event ID 4625">
+</p>
 
-*   **Logon Type:** `3` (Network Logon - confirms the attack originated over the network, not via console).
-*   **Source IP:** `10.0.2.5` (Identifies the attacker's Kali Linux machine).
-*   **Target Account:** `administrator`
+*Wnioski z wdrożenia:* Podczas pierwszej próby Windows Defender Firewall całkowicie dropował pakiety sieciowe, przez co system nie generował logów audytowych. Dopiero po odpowiedniej rekonfiguracji profili zapory sieciowej telemetria zaczęła poprawnie spływać do SIEM-a.
 
-Sysmon captured the telemetry of the network socket creation during the Nmap scan and SMB connection attempts, tracking the source process and destination ports.
+#### 🛜 Analiza ruchu sieciowego: Wireshark PCAP
+Równolegle z analizą logów systemowych, zweryfikowałem ruch na poziomie pakietów. 
 
----
+<p align="center">
+  <img src="wireshark-pcap-smb-failure.png" width="75%" alt="Wireshark SMB Failure">
+</p>
 
-## 🛜 Network Packet Analysis (Wireshark)
-To validate the alerts at the packet level, network traffic was captured during the attack simulation.
-<img width="1440" height="255" alt="wireshark-smb-attack" src="https://github.com/user-attachments/assets/f620a488-3b25-4872-b09a-47d685ab6f1d" />
-*   **Analysis:** The capture clearly shows a flood of TCP SYN packets hitting multiple ports in a fraction of a second (Nmap Scan pattern), followed by SMB negotiation traffic on port `445` containing `STATUS_LOGON_FAILURE` responses from the Windows host.
-
----
-
-## 🚀 Key Takeaways & Conclusions
-*   Successfully established a centralized visibility pipeline from a Windows Endpoint to an enterprise SIEM.
-*   Understood the importance of host-based firewalls; during the initial phase, Windows Defender Firewall dropped the packets, preventing authentication logging until explicit rules were engineered.
-*   Demonstrated how endpoint telemetry (Sysmon/Windows Logs) correlates perfectly with network-level evidence (Wireshark PCAPs).
+Filtrowanie protokołu `smb` wykazało sekwencję pakietów negocjacji sesji, która zakończyła się jednoznacznym komunikatem ze strony serwera Windows: `STATUS_LOGON_FAILURE`. To bezpośredni, sieciowy dowód korelujący z Event ID 4625 z logów hosta.
 
 ---
 
 ## ⚔️ Case Study 2: PowerShell Reverse Shell & Execution Detection
 
-### 1. Attack Phase (Red Team Action)
-To simulate a post-exploitation phase, an unprivileged user executed a malicious PowerShell one-liner. This script initiates a raw TCP socket connection back to the attacker's listener, granting complete command-line control over the endpoint (Reverse Shell).
+### 1. Przebieg ataku (Red Team)
+W celu zsymulowania fazy poeksploatacyjnej (Post-Exploitation), na maszynie ofiary uruchomiłem skrypt mapujący surowe gniazdo TCP z powrotem do maszyny atakującego, co pozwala na zdalne wykonywanie komend w systemie operacyjnym (Reverse Shell).
 
-* **Attacker Listener (Kali Linux):**
+* **Nasłuch na Kali (Netcat):**
     ```bash
     nc -lvnp 4444
     ```
-* **Execution Command (Windows Host):**
-    The adversary executed a highly obfuscated network socket redirection script directly inside the Windows PowerShell console to bypass default execution policies.
+* **Komenda uruchomiona na Windowsie:**
+    Wykorzystałem jednolinijkowy skrypt PowerShell tworzący obiekt `System.Net.Sockets.TCPClient` kierujący ruch na adres `10.0.2.5:4444`.
 
-### 2. MITRE ATT&CK Mapping
-* **Tactic:** Execution ([TA0002](https://attack.mitre.org/tactics/TA0002/)) $\rightarrow$ **Technique:** Command and Scripting Interpreter: PowerShell ([T1059.001](https://attack.mitre.org/techniques/T1059/001/))
-* **Tactic:** Command and Control ([TA0011](https://attack.mitre.org/tactics/TA0011/)) $\rightarrow$ **Technique:** Application Layer Protocol ([T1071](https://attack.mitre.org/techniques/T1071/))
+### 2. Mapowanie do MITRE ATT&CK
+* **Taktyka:** Execution ([TA0002](https://attack.mitre.org/tactics/TA0002/)) $\rightarrow$ **Technika:** Command and Scripting Interpreter: PowerShell ([T1059.001](https://attack.mitre.org/techniques/T1059/001/))
+* **Taktyka:** Command and Control ([TA0011](https://attack.mitre.org/tactics/TA0011/)) $\rightarrow$ **Technika:** Application Layer Protocol ([T1071](https://attack.mitre.org/techniques/T1071/))
 
-### 3. Detection Engineering & Log Analysis (Blue Team)
-While basic malicious scripts can sometimes evade legacy signature-based antiviruses when dynamic obfuscation is used, **Microsoft Sysmon Event ID 1 (Process Creation)** acts as a robust telemetry fallback by recording the immutable command line context.
+### 3. Detekcja i analiza logów (Blue Team)
 
-* **Monitored Event:** Sysmon Event ID 1 (Process Creation)
-  <img width="1483" height="291" alt="wazuh-sysmon-event1-powershell-execution_1" src="https://github.com/user-attachments/assets/2434eaa2-3389-4d44-9a55-4c83c354e191" />
-  <img width="1489" height="183" alt="wazuh-sysmon-event1-powershell-execution_2" src="https://github.com/user-attachments/assets/d85a9f03-4bda-4617-ac26-c0d82306c747" />
-* **Target Process:** `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe`
-* **Evidence Collected:** The `commandLine` field completely exposed the entire network payload string and the hardcoded callback IP address (`10.0.2.5`).
+#### 🔴 Logi systemowe: Sysmon Event ID 1 (Process Creation)
+Podczas testów napotkałem mechanizm ochronny Windows Defender (AMSI), który blokował wykonanie skryptu bezpośrednio w konsoli PowerShell. Po tymczasowym wyłączeniu ochrony w czasie rzeczywistym w celu dokończenia symulacji, sensor Sysmon zarejestrował zdarzenie utworzenia procesu.
 
 <p align="center">
-  <img src="TUTAJ_PRZECIĄGNIJ_LUB_WKLEJ_LINK_DO_ZDJECIA_wazuh-reverse-shell.png" width="75%">
+  <img src="wazuh-sysmon-event1-powershell-execution.png" width="75%" alt="Sysmon Event ID 1 CommandLine">
 </p>
+
+*Analiza mechanizmu Sysmon:* Wklejenie złośliwego kodu bezpośrednio do otwartej wcześniej konsoli PowerShell nie generuje nowego Event ID 1 (ponieważ nie powstaje nowy proces, kod wykonuje się wewnątrz istniejącego PID). Aby poprawnie udokumentować to zdarzenie w SIEM, wywołałem skrypt z poziomu klasycznego Wiersza poleceń (`cmd.exe`), wymuszając flagę `-Command`. Dzięki temu pole `data.win.eventdata.commandLine` w pełni ujawniło cały złośliwy payload sieciowy wraz z zakodowanym adresem IP atakującego.
+
+---
+
+## 🚀 Główne wnioski z projektu
+* **Korelacja źródeł:** Projekt udowodnił, jak ważne jest łączenie telemetrii z hosta (Sysmon/Event Viewer) z dowodami z warstwy sieciowej (Wireshark). Dopiero zestawienie tych danych daje pełny obraz incydentu.
+* **Tuning sensorów:** Domyślna konfiguracja systemów Windows pomija wiele kluczowych zdarzeń (np. szczegóły CommandLine czy monitorowanie połączeń sieciowych przez PowerShell). Wdrożenie Sysmona z odpowiednimi filtrami drastycznie zwiększa widoczność (visibility) analityka SOC.
