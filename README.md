@@ -61,9 +61,7 @@ Sysmon captured the telemetry of the network socket creation during the Nmap sca
 
 ## 🛜 Network Packet Analysis (Wireshark)
 To validate the alerts at the packet level, network traffic was captured during the attack simulation.
-<p align="center">
-
-  <img src="https://github.com/user-attachments/assets/89d3de22-2b5d-4709-b37e-8e7225c3bb88" width="75%"></p>
+<img width="1440" height="255" alt="wireshark-smb-attack" src="https://github.com/user-attachments/assets/f620a488-3b25-4872-b09a-47d685ab6f1d" />
 *   **Analysis:** The capture clearly shows a flood of TCP SYN packets hitting multiple ports in a fraction of a second (Nmap Scan pattern), followed by SMB negotiation traffic on port `445` containing `STATUS_LOGON_FAILURE` responses from the Windows host.
 
 ---
