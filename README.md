@@ -49,18 +49,14 @@ Agent Wazuh pomyślnie przechwycił i przesłał do bazy log dotyczący nieudane
 * **Source IP:** `10.0.2.5` – wskazuje bezpośrednio na maszynę Kali Linux jako źródło ataku.
 * **Target Account:** `administrator`
 
-<p align="center">
-  <img src="wazuh-event-4625-logon-failure.png" width="75%" alt="Wazuh Event ID 4625">
-</p>
+<img width="719" height="785" alt="wazuh-alert-4625" src="https://github.com/user-attachments/assets/c0955a8e-d576-4d74-b24a-acadb512e29d" />
 
 *Wnioski z wdrożenia:* Podczas pierwszej próby Windows Defender Firewall całkowicie dropował pakiety sieciowe, przez co system nie generował logów audytowych. Dopiero po odpowiedniej rekonfiguracji profili zapory sieciowej telemetria zaczęła poprawnie spływać do SIEM-a.
 
 #### Analiza ruchu sieciowego: Wireshark PCAP
 Równolegle z analizą logów systemowych, zweryfikowałem ruch na poziomie pakietów. 
 
-<p align="center">
-  <img src="wireshark-pcap-smb-failure.png" width="75%" alt="Wireshark SMB Failure">
-</p>
+<img width="1440" height="255" alt="wireshark-smb-attack" src="https://github.com/user-attachments/assets/f620a488-3b25-4872-b09a-47d685ab6f1d" />
 
 Filtrowanie protokołu `smb` wykazało sekwencję pakietów negocjacji sesji, która zakończyła się jednoznacznym komunikatem ze strony serwera Windows: `STATUS_LOGON_FAILURE`. To bezpośredni, sieciowy dowód korelujący z Event ID 4625 z logów hosta.
 
@@ -87,9 +83,10 @@ W celu zsymulowania fazy poeksploatacyjnej (Post-Exploitation), na maszynie ofia
 #### Logi systemowe: Sysmon Event ID 1 (Process Creation)
 Podczas testów napotkałem mechanizm ochronny Windows Defender (AMSI), który blokował wykonanie skryptu bezpośrednio w konsoli PowerShell. Po tymczasowym wyłączeniu ochrony w czasie rzeczywistym w celu dokończenia symulacji, sensor Sysmon zarejestrował zdarzenie utworzenia procesu.
 
-<p align="center">
-  <img src="wazuh-sysmon-event1-powershell-execution.png" width="75%" alt="Sysmon Event ID 1 CommandLine">
-</p>
+<img width="1483" height="291" alt="wazuh-sysmon-event1-powershell-execution_1" src="https://github.com/user-attachments/assets/021baabe-b189-4b69-9778-ea40466a132e" />
+<img width="1489" height="183" alt="wazuh-sysmon-event1-powershell-execution_2" src="https://github.com/user-attachments/assets/c23123e9-d5b3-4b68-ae15-314b4848b337" />
+
+
 
 *Analiza mechanizmu Sysmon:* Wklejenie złośliwego kodu bezpośrednio do otwartej wcześniej konsoli PowerShell nie generuje nowego Event ID 1 (ponieważ nie powstaje nowy proces, kod wykonuje się wewnątrz istniejącego PID). Aby poprawnie udokumentować to zdarzenie w SIEM, wywołałem skrypt z poziomu klasycznego Wiersza poleceń (`cmd.exe`), wymuszając flagę `-Command`. Dzięki temu pole `data.win.eventdata.commandLine` w pełni ujawniło cały złośliwy payload sieciowy wraz z zakodowanym adresem IP atakującego.
 
