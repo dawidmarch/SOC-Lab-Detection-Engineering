@@ -17,7 +17,7 @@ Całe laboratorium zostało uruchomione lokalnie na moim fizycznym komputerze. O
 ## Oprogramowanie i Wirtualizacja (Software Stack)
 * **Hiperwzorzec:** Oracle VirtualBox (wersja 7.2.10) – posłużył do stworzenia izolowanej sieci typu Host-Only (`10.0.2.0/24`), całkowicie bezpiecznej dla systemu operacyjnego hosta.
 * **SIEM / XDR:** Wazuh Manager (Virtual Appliance oparty na Ubuntu) – `10.0.2.3` (Centralny punkt zbierania i analizy logów).
-* **Endpoint (Ofiara):** Windows 10 Pro – `10.0.2.15` (Zainstalowany agent Wazuh oraz sensor Microsoft Sysmon z konfiguracją SwiftOnSecurity).
+* **Endpoint (Ofiara):** Windows 10 Pro – `10.0.2.4` (Zainstalowany agent Wazuh oraz sensor Microsoft Sysmon z konfiguracją SwiftOnSecurity).
 * **System Atakującego:** Kali Linux – `10.0.2.5` (Platforma do generowania ruchu i symulacji ataków).
 * **Analiza Sieciowa:** Wireshark – narzędzie do przechwytywania i analizy surowych pakietów (PCAP).
 
