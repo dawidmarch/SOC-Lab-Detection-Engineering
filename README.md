@@ -5,12 +5,12 @@ Projekt stworzyłem w celu praktycznego przetestowania mechanizmów detekcji zag
 ---
 
 ## 💻 Hardware & Host OS (Platforma sprzętowa)
-Całe laboratorium zostało uruchomione lokalnie na moim fizycznym komputerze. Odpowiednie zarządzanie zasobami było kluczowe, aby zapewnić stabilne działanie systemu SIEM oraz maszyn klienckich.
+Całe laboratorium zostało uruchomione lokalnie na moim fizycznym komputerze. Odpowiednie alokowanie zasobów było kluczowe, aby zapewnić stabilną pracę menedżera SIEM (Wazuh) przy jednoczesnym działaniu maszyn klienckich. Duży zapas pamięci RAM (32 GB) pozwolił na bezproblemowe i płynne działanie całej topologii bez konieczności agresywnego przycinania pamięci dla maszyn wirtualnych.
 
-* **System operacyjny hosta:** Windows 11 Pro [Zmień jeśli masz inny, np. Windows 10]
-* **Procesor (CPU):** [Wpisz swój procesor, np. Intel Core i5-11400F / AMD Ryzen 5]
-* **Pamięć RAM:** [Wpisz swój RAM, np. 16 GB / 32 GB]
-* **Dysk:** SSD NVMe
+* **System operacyjny hosta:** Windows 10 Pro (64-bit)
+* **Procesor (CPU):** Intel(R) Core(TM) i7-2600 CPU @ 3.40GHz
+* **Pamięć RAM:** 32,0 GB
+* **Dysk:** SSD Patriot P210 512GB
 
 ---
 
