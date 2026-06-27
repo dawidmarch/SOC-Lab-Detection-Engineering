@@ -113,8 +113,6 @@ To zadanie stanowi bezpośrednią kontynuację działań poeksploatacyjnych. Wyk
 
 ### 3. Detekcja i analiza logów 
 
-<img width="925" height="675" alt="wazuh-persistence-execution" src="https://github.com/user-attachments/assets/a226a2bb-48a1-4645-b478-c9bd731bf7bf" />
-
 #### Logi systemowe: Sysmon Event ID 1 
 Użycie natywnych narzędzi administracyjnych Windows (techniki *Living off the Land*) często omija podstawowe reguły antywirusowe. Podczas analizy w środowisku SIEM, samo utworzenie zadania przez administratora nie wywołało domyślnego alertu o wysokim priorytecie. Kluczowy moment detekcji nastąpił jednak w fazie egzekucji (Execution), gdy usługa systemowa podjęła próbę uruchomienia zdefiniowanego skryptu.
 
@@ -123,5 +121,7 @@ Sensor Sysmon zarejestrował zdarzenie jako utworzenie nowego procesu przez syst
 * **Uruchomiony proces:** `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe`
 * **Kontekst użytkownika:** `ZARZĄDZANIE NT\SYSTEM` (Eskalacja do najwyższych uprawnień systemowych)
 * **Proces nadrzędny (Parent Image):** `C:\Windows\System32\svchost.exe` uruchamiany przez usługę systemową Harmonogramu Zadań (`-s Schedule`).
+
+  <img width="925" height="675" alt="wazuh-persistence-execution" src="https://github.com/user-attachments/assets/a226a2bb-48a1-4645-b478-c9bd731bf7bf" />
 
 *Wnioski z analizy:* Uruchomienie konsoli PowerShell bezpośrednio przez proces `svchost.exe` (Schedule) w kontekście konta `SYSTEM` to podręcznikowy wskaźnik anomalii procesowej. W realnym środowisku produkcyjnym taki schemat zachowania natychmiast kwalifikuje hosta do pełnej izolacji sieciowej, ponieważ potwierdza udane złośliwe zagnieżdżenie się w systemie i eskalację uprawnień.
