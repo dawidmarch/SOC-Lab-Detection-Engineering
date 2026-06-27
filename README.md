@@ -125,3 +125,36 @@ Sensor Sysmon zarejestrował zdarzenie jako utworzenie nowego procesu przez syst
   <img width="925" height="675" alt="wazuh-persistence-execution" src="https://github.com/user-attachments/assets/a226a2bb-48a1-4645-b478-c9bd731bf7bf" />
 
 *Wnioski z analizy:* Uruchomienie konsoli PowerShell bezpośrednio przez proces `svchost.exe` (Schedule) w kontekście konta `SYSTEM` to podręcznikowy wskaźnik anomalii procesowej. W realnym środowisku produkcyjnym taki schemat zachowania natychmiast kwalifikuje hosta do pełnej izolacji sieciowej, ponieważ potwierdza udane złośliwe zagnieżdżenie się w systemie i eskalację uprawnień.
+
+
+
+---
+
+## Case Study 4: TCP SYN Stealth Scan & Packet Inspection (Wireshark Forensics)
+
+### 1. Przebieg ataku
+W celu zidentyfikowania aktywnych usług na maszynie ofiary (`10.0.2.4`) bez ustanawiania pełnego połączenia TCP (co mogłoby wygenerować głośne alerty w systemach aplikacyjnych), z poziomu maszyny Kali Linux (`10.0.2.5`) przeprowadziłem ukryte skanowanie portów typu **TCP SYN Stealth Scan**. Atak został ukierunkowany na kluczowe porty infrastrukturalne Windows: 135 (RPC) oraz 445 (SMB).
+
+* **Egzekucja skanowania z poziomu Kali Linux:**
+    ```bash
+    sudo nmap -sS -p 135,445 10.0.2.4
+    ```
+
+### 2. Mapowanie do MITRE ATT&CK
+* **Taktyka:** Discovery ([TA0007](https://attack.mitre.org/tactics/TA0007/)) $\rightarrow$ **Technika:** Network Service Discovery ([T1046](https://attack.mitre.org/techniques/T1046/))
+
+### 3. Detekcja i analiza ruchu sieciowego
+
+#### Analiza pakietów: Wireshark PCAP
+Podczas gdy tradycyjne logi systemu hosta rzadko odnotowują niedokończone próby połączeń na warstwie aplikacji, analiza surowego ruchu sieciowego w Wiresharku pozwoliła na natychmiastowe zidentyfikowanie anomalii behawioralnej w protokole TCP.
+
+Filtrowanie ruchu za pomocą reguły `ip.addr == 10.0.2.4 and tcp` ujawniło powtarzający się, nienaturalny wzorzec komunikacji dla badanych portów (np. portu 445):
+
+1. **`Kali -> Windows [SYN]`**: Adwersarz wysyła pakiet inicjujący połączenie.
+2. **`Windows -> Kali [SYN, ACK]`**: Host docelowy potwierdza gotowość i wskazuje, że port jest otwarty.
+3. **`Kali -> Windows [RST]`**: Zamiast wysłania standardowego pakietu `ACK` kończącego klasyczny proces *TCP Three-Way Handshake*, maszyna atakująca natychmiach wysyła flagę **RST (Reset)**, brutalnie przerywając sesję.
+
+<img width="1585" height="441" alt="wireshark-syn-scan" src="https://github.com/user-attachments/assets/570443e5-6003-4895-90ae-f3c865fe573e" />
+
+
+*Wnioski z analizy:* Masowe pojawianie się pakietów `RST` bezpośrednio po otrzymaniu odpowiedzi `SYN-ACK` z danego adresu IP to jednoznaczny, sieciowy wskaźnik intruzji (IoC) wskazujący na zautomatyzowane skanowanie środowiska. W systemach klasy Network Detection and Response (NDR) lub na zaporach sieciowych, wykrycie takiej sekwencji z jednego źródła w krótkim oknie czasowym automatycznie wyzwala regułę progową (Threshold Rule) i skutkuje natychmiastowym zablokowaniem IP napastnika.
