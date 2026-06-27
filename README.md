@@ -122,8 +122,7 @@ Sensor Sysmon zarejestrował zdarzenie jako utworzenie nowego procesu przez syst
 * **Kontekst użytkownika:** `ZARZĄDZANIE NT\SYSTEM` (Eskalacja do najwyższych uprawnień systemowych)
 * **Proces nadrzędny (Parent Image):** `C:\Windows\System32\svchost.exe` uruchamiany przez usługę systemową Harmonogramu Zadań (`-s Schedule`).
 
-<p align="center">
-  <img src="wazuh-persistence-execution.png" width="75%" alt="Wazuh Sysmon Task Execution Anomalies">
-</p>
+<img width="925" height="675" alt="wazuh-persistence-execution" src="https://github.com/user-attachments/assets/a226a2bb-48a1-4645-b478-c9bd731bf7bf" />
+
 
 *Wnioski z analizy:* Uruchomienie konsoli PowerShell bezpośrednio przez proces `svchost.exe` (Schedule) w kontekście konta `SYSTEM` to podręcznikowy wskaźnik anomalii procesowej (Parent-Child process anomaly). W realnym środowisku produkcyjnym taki schemat zachowania natychmiast kwalifikuje hosta do pełnej izolacji sieciowej, ponieważ potwierdza udane złośliwe zagnieżdżenie się w systemie i eskalację uprawnień.
