@@ -153,8 +153,7 @@ Filtrowanie ruchu za pomocą reguły `ip.addr == 10.0.2.4 and tcp` ujawniło pow
 2. **`Windows -> Kali [SYN, ACK]`**: Host docelowy potwierdza gotowość i wskazuje, że port jest otwarty.
 3. **`Kali -> Windows [RST]`**: Zamiast wysłania standardowego pakietu `ACK` kończącego klasyczny proces *TCP Three-Way Handshake*, maszyna atakująca natychmiach wysyła flagę **RST (Reset)**, brutalnie przerywając sesję.
 
-<img width="1585" height="441" alt="wireshark-syn-scan" src="https://github.com/user-attachments/assets/570443e5-6003-4895-90ae-f3c865fe573e" />
-
+<img width="1585" height="441" alt="wireshark-syn-scan" src="https://github.com/user-attachments/assets/661a5cb0-d477-4985-833e-791b6b1ecd91" />
 
 *Wnioski z analizy:* Masowe pojawianie się pakietów `RST` bezpośrednio po otrzymaniu odpowiedzi `SYN-ACK` z danego adresu IP to jednoznaczny, sieciowy wskaźnik intruzji (IoC) wskazujący na zautomatyzowane skanowanie środowiska. W systemach klasy Network Detection and Response (NDR) lub na zaporach sieciowych, wykrycie takiej sekwencji z jednego źródła w krótkim oknie czasowym automatycznie wyzwala regułę progową i skutkuje natychmiastowym zablokowaniem IP napastnika.
 
@@ -195,6 +194,6 @@ Dodatkowo przeanalizowałem ruch sieciowy, nasłuchując na interfejsie maszyny.
 
 Kluczowym znaleziskiem w warstwie aplikacji (nagłówki HTTP) było pole `User-Agent`, które przedstawiło się jako `CertUtil URL Agent`. Stanowi to bardzo mocny wskaźnik kompromitacji (IoC) na poziomie sieci, który pozwala na łatwe stworzenie reguły blokującej w systemach IDS/IPS (np. Suricata lub Snort).
 
-<img width="1043" height="742" alt="wireshark" src="https://github.com/user-attachments/assets/fe91a485-94c2-4f7c-9581-2d45e8a021fb" />
+<img width="1043" height="742" alt="wireshark" src="https://github.com/user-attachments/assets/333f6a32-4a83-4b80-8676-6fcdfb04f9d0" />
 
 *Wnioski z analizy:* Narzędzia typu LOLBins stanowią ogromne wyzwanie dla klasycznych systemów antywirusowych, ponieważ sam plik `certutil.exe` jest podpisany przez Microsoft i w pełni zaufany. Skuteczna detekcja opiera się tutaj wyłącznie na monitorowaniu behawioralnym – korelacji uruchamianego procesu z jego nietypowymi argumentami (wiersz poleceń) oraz na wychwytywaniu anomalii sieciowych w warstwie aplikacji (specyficzny User-Agent).
