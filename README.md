@@ -95,7 +95,7 @@ Podczas testów napotkałem mechanizm ochronny Windows Defender (AMSI), który b
 *Analiza mechanizmu Sysmon:* Wklejenie złośliwego kodu bezpośrednio do otwartej wcześniej konsoli PowerShell nie generuje nowego Event ID 1 (ponieważ nie powstaje nowy proces, kod wykonuje się wewnątrz istniejącego PID). Aby poprawnie udokumentować to zdarzenie w SIEM, wywołałem skrypt z poziomu klasycznego Wiersza poleceń (`cmd.exe`), wymuszając flagę `-Command`. Dzięki temu pole `data.win.eventdata.commandLine` w pełni ujawniło cały złośliwy payload sieciowy wraz z zakodowanym adresem IP atakującego.
 
 
-
+---
  
 
 ## Case Study 3: Scheduled Task Persistence & Execution Detection
