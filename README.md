@@ -53,6 +53,7 @@ Agent Wazuh pomyślnie przechwycił i przesłał do bazy log dotyczący nieudane
 
 <img width="719" height="785" alt="wazuh-alert-4625" src="https://github.com/user-attachments/assets/c0955a8e-d576-4d74-b24a-acadb512e29d" />
 
+
 *Wnioski z wdrożenia:* Podczas pierwszej próby Windows Defender Firewall całkowicie dropował pakiety sieciowe, przez co system nie generował logów audytowych. Dopiero po odpowiedniej rekonfiguracji profili zapory sieciowej telemetria zaczęła poprawnie spływać do SIEM-a.
 
 #### Analiza ruchu sieciowego: Wireshark PCAP
@@ -91,7 +92,6 @@ Podczas testów napotkałem mechanizm ochronny Windows Defender (AMSI), który b
 <img width="1489" height="183" alt="wazuh-sysmon-event1-powershell-execution_2" src="https://github.com/user-attachments/assets/c23123e9-d5b3-4b68-ae15-314b4848b337" />
 
 
-
 *Analiza mechanizmu Sysmon:* Wklejenie złośliwego kodu bezpośrednio do otwartej wcześniej konsoli PowerShell nie generuje nowego Event ID 1 (ponieważ nie powstaje nowy proces, kod wykonuje się wewnątrz istniejącego PID). Aby poprawnie udokumentować to zdarzenie w SIEM, wywołałem skrypt z poziomu klasycznego Wiersza poleceń (`cmd.exe`), wymuszając flagę `-Command`. Dzięki temu pole `data.win.eventdata.commandLine` w pełni ujawniło cały złośliwy payload sieciowy wraz z zakodowanym adresem IP atakującego.
 
 
@@ -124,6 +124,7 @@ Sensor Sysmon zarejestrował zdarzenie jako utworzenie nowego procesu przez syst
 
   <img width="925" height="675" alt="wazuh-persistence-execution" src="https://github.com/user-attachments/assets/a226a2bb-48a1-4645-b478-c9bd731bf7bf" />
 
+
 *Wnioski z analizy:* Uruchomienie konsoli PowerShell bezpośrednio przez proces `svchost.exe` (Schedule) w kontekście konta `SYSTEM` to podręcznikowy wskaźnik anomalii procesowej. W realnym środowisku produkcyjnym taki schemat zachowania natychmiast kwalifikuje hosta do pełnej izolacji sieciowej, ponieważ potwierdza udane złośliwe zagnieżdżenie się w systemie i eskalację uprawnień.
 
 
@@ -154,6 +155,7 @@ Filtrowanie ruchu za pomocą reguły `ip.addr == 10.0.2.4 and tcp` ujawniło pow
 3. **`Kali -> Windows [RST]`**: Zamiast wysłania standardowego pakietu `ACK` kończącego klasyczny proces *TCP Three-Way Handshake*, maszyna atakująca natychmiach wysyła flagę **RST (Reset)**, brutalnie przerywając sesję.
 
 <img width="1585" height="441" alt="wireshark-syn-scan" src="https://github.com/user-attachments/assets/661a5cb0-d477-4985-833e-791b6b1ecd91" />
+
 
 *Wnioski z analizy:* Masowe pojawianie się pakietów `RST` bezpośrednio po otrzymaniu odpowiedzi `SYN-ACK` z danego adresu IP to jednoznaczny, sieciowy wskaźnik intruzji (IoC) wskazujący na zautomatyzowane skanowanie środowiska. W systemach klasy Network Detection and Response (NDR) lub na zaporach sieciowych, wykrycie takiej sekwencji z jednego źródła w krótkim oknie czasowym automatycznie wyzwala regułę progową i skutkuje natychmiastowym zablokowaniem IP napastnika.
 
@@ -195,5 +197,6 @@ Dodatkowo przeanalizowałem ruch sieciowy, nasłuchując na interfejsie maszyny.
 Kluczowym znaleziskiem w warstwie aplikacji (nagłówki HTTP) było pole `User-Agent`, które przedstawiło się jako `CertUtil URL Agent`. Stanowi to bardzo mocny wskaźnik kompromitacji (IoC) na poziomie sieci, który pozwala na łatwe stworzenie reguły blokującej w systemach IDS/IPS (np. Suricata lub Snort).
 
 <img width="1043" height="742" alt="wireshark" src="https://github.com/user-attachments/assets/333f6a32-4a83-4b80-8676-6fcdfb04f9d0" />
+
 
 *Wnioski z analizy:* Narzędzia typu LOLBins stanowią ogromne wyzwanie dla klasycznych systemów antywirusowych, ponieważ sam plik `certutil.exe` jest podpisany przez Microsoft i w pełni zaufany. Skuteczna detekcja opiera się tutaj wyłącznie na monitorowaniu behawioralnym – korelacji uruchamianego procesu z jego nietypowymi argumentami (wiersz poleceń) oraz na wychwytywaniu anomalii sieciowych w warstwie aplikacji (specyficzny User-Agent).
