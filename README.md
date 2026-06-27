@@ -22,7 +22,7 @@ Całe laboratorium zostało uruchomione lokalnie na moim fizycznym komputerze. O
 * **Analiza Sieciowa:** Wireshark – narzędzie do przechwytywania i analizy surowych pakietów (PCAP).
 
 
-
+---
 
 
 ## Case Study 1: SMB Reconnaissance & Brute-Force
@@ -63,7 +63,7 @@ Równolegle z analizą logów systemowych, zweryfikowałem ruch na poziomie paki
 Filtrowanie protokołu `smb` wykazało sekwencję pakietów negocjacji sesji, która zakończyła się jednoznacznym komunikatem ze strony serwera Windows: `STATUS_LOGON_FAILURE`. To bezpośredni, sieciowy dowód korelujący z Event ID 4625 z logów hosta.
 
 
-
+---
 
 
 ## Case Study 2: PowerShell Reverse Shell & Execution Detection
