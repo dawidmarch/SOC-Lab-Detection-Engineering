@@ -95,3 +95,35 @@ Podczas testów napotkałem mechanizm ochronny Windows Defender (AMSI), który b
 ## Główne wnioski z projektu
 * **Korelacja źródeł:** Projekt udowodnił, jak ważne jest łączenie telemetrii z hosta (Sysmon/Event Viewer) z dowodami z warstwy sieciowej (Wireshark). Dopiero zestawienie tych danych daje pełny obraz incydentu.
 * **Tuning sensorów:** Domyślna konfiguracja systemów Windows pomija wiele kluczowych zdarzeń (np. szczegóły CommandLine czy monitorowanie połączeń sieciowych przez PowerShell). Wdrożenie Sysmona z odpowiednimi filtrami drastycznie zwiększa widoczność (visibility) analityka SOC.
+
+---
+
+## ⚔️ Case Study 3: Scheduled Task Persistence & Execution Detection
+
+### 1. Przebieg ataku (Red Team Action)
+To zadanie stanowi bezpośrednią kontynuację działań poeksploatacyjnych. Wykorzystując aktywną sesję Reverse Shell na maszynie Kali Linux (`10.0.2.5`), przesłałem zdalnie do przejętego systemu Windows (`10.0.2.15`) komendę tworzącą złośliwy wpis w Harmonogramie Zadań. Celem adwersarza było zapewnienie stałego, ukrytego powrotu do systemu (Persistence) z najwyższymi uprawnieniami.
+
+* **Zdalna egzekucja z poziomu Kali Linux (wewnątrz aktywnej sesji hakerskiej):**
+    ```cmd
+    schtasks /create /tn "WindowsMaliciousUpdate" /tr "powershell.exe -nop -w hidden -c Get-Process" /sc minute /mo 5 /ru "SYSTEM"
+    ```
+
+### 2. Mapowanie do MITRE ATT&CK
+* **Taktyka:** Persistence ([TA0003](https://attack.mitre.org/tactics/TA0003/)) $\rightarrow$ **Technika:** Scheduled Task/Job: Scheduled Task ([T1053.005](https://attack.mitre.org/techniques/T1053/005/))
+
+### 3. Detekcja i analiza logów (Blue Team)
+
+#### Logi systemowe: Sysmon Event ID 1 (Process Creation)
+Użycie natywnych narzędzi administracyjnych Windows (techniki *Living off the Land*) często omija podstawowe reguły antywirusowe. Podczas analizy w środowisku SIEM, samo utworzenie zadania przez administratora nie wywołało domyślnego alertu o wysokim priorytecie. Kluczowy moment detekcji nastąpił jednak w fazie egzekucji (Execution), gdy usługa systemowa podjęła próbę uruchomienia zdefiniowanego skryptu.
+
+Sensor Sysmon zarejestrował zdarzenie jako utworzenie nowego procesu przez system (Event ID 1) z następującą telemetrią:
+
+* **Uruchomiony proces:** `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe`
+* **Kontekst użytkownika:** `ZARZĄDZANIE NT\SYSTEM` (Eskalacja do najwyższych uprawnień systemowych)
+* **Proces nadrzędny (Parent Image):** `C:\Windows\System32\svchost.exe` uruchamiany przez usługę systemową Harmonogramu Zadań (`-s Schedule`).
+
+<p align="center">
+  <img src="wazuh-persistence-execution.png" width="75%" alt="Wazuh Sysmon Task Execution Anomalies">
+</p>
+
+*Wnioski z analizy:* Uruchomienie konsoli PowerShell bezpośrednio przez proces `svchost.exe` (Schedule) w kontekście konta `SYSTEM` to podręcznikowy wskaźnik anomalii procesowej (Parent-Child process anomaly). W realnym środowisku produkcyjnym taki schemat zachowania natychmiast kwalifikuje hosta do pełnej izolacji sieciowej, ponieważ potwierdza udane złośliwe zagnieżdżenie się w systemie i eskalację uprawnień.
