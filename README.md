@@ -263,7 +263,7 @@ W ramach wstępnego triagu alertów z systemu Wazuh SIEM przeanalizowałem zdarz
 
 <img width="905" height="819" alt="VENT" src="https://github.com/user-attachments/assets/a6015101-7066-4a51-962b-e561d342a020" />
 
-*Wnioski z analizy (Działania SOC L1):* Obecność zdarzenia 4624 w następstwie logów 4625 stanowi bezwzględne potwierdzenie skutecznego przełamania hasła (True Positive). Procedura reakcji L1 wymagała:
+*Wnioski z analizy:* Obecność zdarzenia 4624 w następstwie logów 4625 stanowi bezwzględne potwierdzenie skutecznego przełamania hasła (True Positive). Procedura reakcji L1 wymaga:
 1. Izolacji sieciowej hosta.
 2. Zablokowania adresu IP `10.0.2.5` na zaporze brzegowej.
 3. Eskalacji incydentu, wymuszenia rotacji haseł oraz przeglądu aktywności użytkownika.
