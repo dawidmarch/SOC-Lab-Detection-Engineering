@@ -235,3 +235,35 @@ Podczas wstępnego triagu alertu (Initial Triage), kluczowe było przeanalizowan
 <img width="820" height="630" alt="powershell" src="https://github.com/user-attachments/assets/51908c29-8535-43c1-8977-d85decd221b7" />
 
 *Wnioski z analizy (Działania SOC L1):* W realnym środowisku produkcyjnym taki obraz logów to natychmiastowe potwierdzenie (True Positive) incydentu o wysokim priorytecie. Identyfikacja flag takich jak `-WindowStyle Hidden` czy metody `Invoke-WebRequest` w linii poleceń pozwala na szybkie powiązanie alertu z aktywnością typu Dropper. Prawidłowa reakcja L1 w tym przypadku obejmowałaby eskalację zgłoszenia, zablokowanie adresu IP serwera C2 na zaporze ogniowej oraz natychmiastową izolację sieciową stacji roboczej hosta, aby zapobiec rozprzestrzenianiu się infekcji.
+
+## Case Study 7: Credential Access (Brute Force Attack)
+
+### 1. Przebieg ataku
+Drugim z najczęstszych zadań analityka SOC jest monitorowanie i klasyfikowanie alertów związanych z uwierzytelnianiem. W tej symulacji odtworzyłem scenariusz, w którym złośliwy aktor przeprowadza atak siłowy (Brute Force / Dictionary Attack) na usługę logowania (SMB) systemu Windows w celu uzyskania początkowego dostępu.
+
+* **Atak (Kali Linux - 10.0.2.5):**
+  Wykorzystałem niestandardowy skrypt w powłoce Bash (wykorzystujący narzędzie `smbclient`) oraz spreparowany słownik `passwords.txt`, aby uderzyć w protokół logowania maszyny ofiary.
+  ```bash
+  for p in $(cat passwords.txt); do smbclient -L //10.0.2.4 -U "user%$p"; done
+
+### 2.Mapowanie do MITRE ATT&CK
+* **Taktyka:** Credential Access ([TA0006](https://attack.mitre.org/tactics/TA0006/)) -> **Technika:** Brute Force: Password Guessing ([T1110.001](https://attack.mitre.org/techniques/T1110/001/))
+* **Taktyka:** Initial Access ([TA0001](https://attack.mitre.org/tactics/TA0001/)) -> **Technika:** Valid Accounts: Local Accounts ([T1078.003](https://attack.mitre.org/techniques/T1078/003/))
+
+### 3.Detekcja i analiza logów 
+
+#### Logi systemowe: Event ID 4625 (Logon Failure), 4740 (Account Lockout) oraz 4624 (Logon Success)
+W ramach wstępnego triagu alertów z systemu Wazuh SIEM przeanalizowałem zdarzenia logowania do systemu z podejrzanego źródła. Do korelacji użyłem kluczowych logów bezpieczeństwa Windows:
+
+* **Wzorzec ataku:** Zaobserwowałem gwałtowny skok zdarzeń oznaczonych jako **Event ID 4625**, wskazujących na seryjne błędne próby podania hasła. Zaobserwowano również log **Event ID 4740**, potwierdzający tymczasowe zablokowanie konta przez system.
+* **Wskaźniki Kompromitacji (IoC):** Wszystkie żądania pochodziły z jednego adresu IP, co wykluczyło scenariusz False Positive. Pole `IpAddress` wskazywało na zewnętrzny adres `10.0.2.5`.
+* **Przełamanie zabezpieczeń (Successful Compromise):** Kluczowym punktem analizy było zidentyfikowanie na osi czasu zdarzenia **Event ID 4624** (Logon Success), które wystąpiło bezpośrednio po serii błędów i pochodziło z tego samego adresu IP atakującego (`10.0.2.5`). 
+
+<img width="798" height="827" alt="vent1" src="https://github.com/user-attachments/assets/d9394911-ff53-4f54-befd-b47be18dfc58" />
+
+<img width="905" height="819" alt="VENT" src="https://github.com/user-attachments/assets/a6015101-7066-4a51-962b-e561d342a020" />
+
+*Wnioski z analizy (Działania SOC L1):* Obecność zdarzenia 4624 w następstwie logów 4625 stanowi bezwzględne potwierdzenie skutecznego przełamania hasła (True Positive). Procedura reakcji L1 wymagała:
+1. Izolacji sieciowej hosta.
+2. Zablokowania adresu IP `10.0.2.5` na zaporze brzegowej.
+3. Eskalacji incydentu, wymuszenia rotacji haseł oraz przeglądu aktywności użytkownika.
