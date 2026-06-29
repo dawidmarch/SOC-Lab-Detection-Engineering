@@ -3,11 +3,6 @@
 ## 1. Cel projektu
 Celem projektu było przeprowadzenie symulowanego ataku typu "credential dumping" (zrzut poświadczeń) na proces `lsass.exe` oraz implementacja mechanizmu detekcji w środowisku Wazuh SIEM z wykorzystaniem telemetrii Sysmon. Projekt demonstruje pełen cykl życia incydentu: od eksploatacji po wykrywanie i analizę w centrum SOC.
 
-### Środowisko laboratoryjne
-* **Target:** Windows 10 (z zainstalowanym Sysmonem i Wazuh Agentem).
-* **Attacker:** Kali Linux (`impacket-psexec`, `mimikatz`).
-* **SIEM:** Wazuh Manager (do korelacji logów i alertowania).
-
 ## 2. MITRE ATT&CK Mapowanie
 
 | Taktyka | Technika | ID | Opis |
