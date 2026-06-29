@@ -25,7 +25,7 @@ Całe laboratorium zostało uruchomione lokalnie na moim fizycznym komputerze. O
 ---
 
 
-### Validation & Practical Application
+## Validation & Practical Application
 
 Wierzę, że teoria ma wartość tylko wtedy, gdy można ją zweryfikować w boju. Początkowo wdrożyłem **7 case studies** bezpośrednio w tym pliku, aby szybko przetestować środowisko i upewnić się, że mechanizmy detekcji działają zgodnie z założeniami.
 
