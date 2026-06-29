@@ -36,6 +36,7 @@ Monitorowanie procesów przez Sysmon (Event ID 10) pozwoliło na rejestrację kr
 
 <img width="1499" height="841" alt="mimikatzexe" src="https://github.com/user-attachments/assets/aefc0682-df76-4f6d-afb9-d149f078b65c" />
 
+
 **Kluczowe artefakty w JSON:**
 
 ```json
