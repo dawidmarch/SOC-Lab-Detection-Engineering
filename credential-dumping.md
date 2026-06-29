@@ -50,7 +50,7 @@ Monitorowanie procesów przez Sysmon (Event ID 10) pozwoliło na rejestrację kr
 ## 5. Wnioski techniczne
 * Proces `lsass.exe` jest krytycznym elementem bezpieczeństwa systemu Windows, przechowującym poświadczenia użytkowników. Dostęp do jego pamięci przez procesy nieuprawnione (jak `mimikatz.exe`) jest zachowaniem wysoce anomalnym.
 
-* Zidentyfikowana wartość GrantedAccess: 0x1010 jednoznacznie wskazuje na próbę odczytu pamięci (PROCESS_VM_READ). W środowisku produkcyjnym takie zachowanie jest niemal zawsze wskaźnikiem (IOC) aktywności napastnika (post-exploitation). Warto zauważyć, że Sysmon pozwolił na precyzyjne wskazanie źródłowego pliku wykonywalnego (sourceImage), co drastycznie skraca czas reakcji (MTTR) zespołu SOC.
+* Zidentyfikowana wartość `GrantedAccess: 0x1010` jednoznacznie wskazuje na próbę odczytu pamięci `(PROCESS_VM_READ)`. W środowisku produkcyjnym takie zachowanie jest niemal zawsze wskaźnikiem (IOC) aktywności napastnika (post-exploitation). Warto zauważyć, że Sysmon pozwolił na precyzyjne wskazanie źródłowego pliku wykonywalnego `(sourceImage)`, co drastycznie skraca czas reakcji (MTTR) zespołu SOC.
 
 ## 6. Rekomendacja (Reguła detekcji)
 W celu zautomatyzowania detekcji wdrożono regułę w pliku `local_rules.xml` serwera Wazuh. Reguła ta alarmuje, gdy dowolny proces prosi o dostęp do pamięci LSASS z wysokimi uprawnieniami.
