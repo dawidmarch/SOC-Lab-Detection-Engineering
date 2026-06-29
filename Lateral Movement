@@ -9,7 +9,7 @@ Wykorzystano narzędzie `impacket-wmiexec` do zdalnego wykonania kodu na hoście
 * **Komenda:** `impacket-wmiexec './Administrator:Haslo123!@10.0.2.4'`
 * **Cel:** Uzyskanie zdalnej powłoki (shell) poprzez usługi WMI.
 
-
+![Analiza ataku](Kali.jpg)
 
 ## 3. Analiza logów (Threat Hunting)
 Po wykonaniu ataku, przeprowadzono analizę logów w platformie Wazuh. Zidentyfikowano zdarzenie `Event ID 1` (Process Create), które jest kluczowe dla wykrycia tego ataku.
