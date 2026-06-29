@@ -3,7 +3,7 @@
 ## 1. Cel projektu
 Demonstracja techniki Lateral Movement z wykorzystaniem WMI (Windows Management Instrumentation) oraz jej wykrywanie za pomocą SIEM (Wazuh) i Sysmon.
 
-## 2. MITRE ATT&CK Mapping
+## 2. MITRE ATT&CK Mapowanie
 
 Poniższa tabela przedstawia mapowanie działań wykonanych podczas testu do ram MITRE ATT&CK. Pozwala to na lepsze zrozumienie taktyk i technik użytych przez atakującego.
 
@@ -28,10 +28,10 @@ Wykorzystałem narzędzie `impacket-wmiexec` do zdalnego wykonania kodu na hośc
 
 <img width="765" height="423" alt="Kali" src="https://github.com/user-attachments/assets/4843a381-7473-4b9b-bad4-7a0fdecb0b3f" />
 
-## 4. Analiza logów (Threat Hunting)
+## 4. Analiza logów 
 Po wykonaniu ataku, przeprowadziłem analizę logów w platformie Wazuh. Zidentyfikowałem zdarzenie `Event ID 1` (Process Create), które jest kluczowe dla wykrycia tego ataku.
 
-### Znalezione dowody (Smoking Gun):
+### Znalezione dowody
 Analiza pliku JSON z logu `whoami.exe` (zgodnie z załączonym **image_be7d42.jpg**) wykazała następujące parametry:
 - **Proces:** `whoami.exe`
 - **Rodzic (ParentImage):** `C:\Windows\System32\cmd.exe`
@@ -44,7 +44,7 @@ Analiza pliku JSON z logu `whoami.exe` (zgodnie z załączonym **image_be7d42.jp
   Usługa `wmiprvse.exe` jest usługą systemową działającą w tle. W momencie ataku nie powstaje nowy proces `wmiprvse.exe`, lecz uruchamia on proces potomny (`cmd.exe`). Sysmon poprawnie zalogował proces potomny, co pozwoliło na identyfikację podejrzanej ścieżki w `parentCommandLine`.
 * **Wskaźnik ataku:** Obecność udziału `ADMIN$` oraz unikalnej struktury polecenia w `parentCommandLine` jest wysoce niestandardowa i stanowi silny wskaźnik użycia techniki `WMIExec`.
 
-## 6. Rekomendacja (Detection Logic)
+## 6. Rekomendacja 
 Aby wykryć ten atak w przyszłości, zaleca się implementację reguły w Wazuh:
 ```xml
 <rule id="100002" level="12">
