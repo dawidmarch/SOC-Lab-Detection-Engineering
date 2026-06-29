@@ -28,8 +28,6 @@ Wykorzystałem narzędzie `impacket-wmiexec` do zdalnego wykonania kodu na hośc
 
 <img width="765" height="423" alt="Kali" src="https://github.com/user-attachments/assets/4843a381-7473-4b9b-bad4-7a0fdecb0b3f" />
 
-<img width="743" height="781" alt="mimikatz" src="https://github.com/user-attachments/assets/8d5ab932-fb53-47a4-900e-f01eee597040" />
-
 
 ## 4. Analiza logów 
 Po wykonaniu ataku, przeprowadziłem analizę logów w platformie Wazuh. Zidentyfikowałem zdarzenie `Event ID 1` (Process Create), które jest kluczowe dla wykrycia tego ataku.
