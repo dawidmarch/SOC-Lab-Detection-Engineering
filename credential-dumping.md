@@ -43,15 +43,22 @@ Monitorowanie procesów przez Sysmon (Event ID 10) pozwoliło na rejestrację kr
 ```
 
 ## 5. Wnioski techniczne
-* **Dlaczego nie było logu "Process Create" dla wmiprvse.exe?** 
-  Usługa `wmiprvse.exe` jest usługą systemową działającą w tle. W momencie ataku nie powstaje nowy proces `wmiprvse.exe`, lecz uruchamia on proces potomny (`cmd.exe`). Sysmon poprawnie zalogował proces potomny, co pozwoliło na identyfikację podejrzanej ścieżki w `parentCommandLine`.
-* **Wskaźnik ataku:** Obecność udziału `ADMIN$` oraz unikalnej struktury polecenia w `parentCommandLine` jest wysoce niestandardowa i stanowi silny wskaźnik użycia techniki `WMIExec`.
+* **Proces `lsass.exe` jest krytycznym elementem bezpieczeństwa systemu Windows, przechowującym poświadczenia użytkowników. Dostęp do jego pamięci przez procesy nieuprawnione (jak `mimikatz.exe`) jest zachowaniem wysoce anomalnym.
 
-## 6. Rekomendacja 
-Aby wykryć ten atak w przyszłości, zaleca się implementację reguły w Wazuh:
-```xml
-<rule id="100002" level="12">
-  <if_sid>61603</if_sid>
-  <field name="data.win.eventdata.parentCommandLine">.*ADMIN\\$.*</field>
-  <description>Lateral Movement - WMIExec Detected</description>
-</rule>
+* **Zidentyfikowana wartość GrantedAccess: 0x1010 jednoznacznie wskazuje na próbę odczytu pamięci (PROCESS_VM_READ). W środowisku produkcyjnym takie zachowanie jest niemal zawsze wskaźnikiem (IOC) aktywności napastnika (post-exploitation). Warto zauważyć, że Sysmon pozwolił na precyzyjne wskazanie źródłowego pliku wykonywalnego (sourceImage), co drastycznie skraca czas reakcji (MTTR) zespołu SOC.
+
+## 6. Rekomendacja (Reguła detekcji)
+W celu zautomatyzowania detekcji wdrożono regułę w pliku `local_rules.xml` serwera Wazuh. Reguła ta alarmuje, gdy dowolny proces prosi o dostęp do pamięci LSASS z wysokimi uprawnieniami.
+
+```XML
+<group name="windows,sysmon,credential_dumping,">
+  <rule id="100005" level="12">
+    <if_sid>61610</if_sid> 
+    <field name="win.eventdata.targetImage">C:\\Windows\\system32\\lsass.exe</field>
+    <field name="win.eventdata.grantedAccess">0x1010</field>
+    <description>ALARM: Podejrzany dostęp do pamięci LSASS (Credential Dumping)</description>
+    <mitre>
+      <id>T1003.001</id>
+    </mitre>
+  </rule>
+</group>
