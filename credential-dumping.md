@@ -1,4 +1,4 @@
-# Case Study: Detekcja Credential Dumpingu (T1003.001)
+# Case Study: Credential Dumping Detection
 
 ## 1. Cel projektu
 Celem projektu było przeprowadzenie symulowanego ataku typu "credential dumping" (zrzut poświadczeń) na proces `lsass.exe` oraz implementacja mechanizmu detekcji w środowisku Wazuh SIEM z wykorzystaniem telemetrii Sysmon. Projekt demonstruje pełen cykl życia incydentu: od eksploatacji po wykrywanie i analizę w centrum SOC.
