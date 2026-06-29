@@ -22,7 +22,7 @@ Całe laboratorium zostało uruchomione lokalnie na moim fizycznym komputerze. O
 * **Analiza Sieciowa:** Wireshark – narzędzie do przechwytywania i analizy surowych pakietów (PCAP).
 
 
----
+
 
 
 ## Scenarios & Detection Analysis
@@ -31,7 +31,7 @@ Poniżej znajdziesz szczegółową analizę przeprowadzonych ataków i detekcji:
 * [Lateral Movement - WMIExec](lateral-movement.md)
 
 
----
+
 
 
 ## Validation & Practical Application
@@ -41,7 +41,7 @@ Wierzę, że teoria ma wartość tylko wtedy, gdy można ją zweryfikować w boj
 Obecnie, w celu zachowania przejrzystości projektu i ułatwienia nawigacji, proces **Detection Engineering** dla kolejnych przypadków przenoszę do osobnych, dedykowanych plików. Każdy z nich stanowi kompletny cykl: od zainicjowania symulowanego zagrożenia, przez analizę telemetrii, aż po weryfikację logiki detekcji.
 
 
----
+
 
 
 ## Case Study 1: SMB Reconnaissance & Brute-Force
@@ -83,7 +83,7 @@ Równolegle z analizą logów systemowych, zweryfikowałem ruch na poziomie paki
 Filtrowanie protokołu `smb` wykazało sekwencję pakietów negocjacji sesji, która zakończyła się jednoznacznym komunikatem ze strony serwera Windows: `STATUS_LOGON_FAILURE`. To bezpośredni, sieciowy dowód korelujący z Event ID 4625 z logów hosta.
 
 
----
+
 
 
 ## Case Study 2: PowerShell Reverse Shell & Execution Detection
@@ -114,7 +114,7 @@ Podczas testów napotkałem mechanizm ochronny Windows Defender (AMSI), który b
 *Analiza mechanizmu Sysmon:* Wklejenie złośliwego kodu bezpośrednio do otwartej wcześniej konsoli PowerShell nie generuje nowego Event ID 1 (ponieważ nie powstaje nowy proces, kod wykonuje się wewnątrz istniejącego PID). Aby poprawnie udokumentować to zdarzenie w SIEM, wywołałem skrypt z poziomu klasycznego Wiersza poleceń (`cmd.exe`), wymuszając flagę `-Command`. Dzięki temu pole `data.win.eventdata.commandLine` w pełni ujawniło cały złośliwy payload sieciowy wraz z zakodowanym adresem IP atakującego.
 
 
----
+
  
 
 ## Case Study 3: Scheduled Task Persistence & Execution Detection
@@ -147,7 +147,7 @@ Sensor Sysmon zarejestrował zdarzenie jako utworzenie nowego procesu przez syst
 *Wnioski z analizy:* Uruchomienie konsoli PowerShell bezpośrednio przez proces `svchost.exe` (Schedule) w kontekście konta `SYSTEM` to podręcznikowy wskaźnik anomalii procesowej. W realnym środowisku produkcyjnym taki schemat zachowania natychmiast kwalifikuje hosta do pełnej izolacji sieciowej, ponieważ potwierdza udane złośliwe zagnieżdżenie się w systemie i eskalację uprawnień.
 
 
----
+
 
 ## Case Study 4: TCP SYN Stealth Scan & Packet Inspection (Wireshark Forensics)
 
