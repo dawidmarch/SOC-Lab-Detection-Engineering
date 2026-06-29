@@ -32,6 +32,8 @@ Wierzę, że teoria ma wartość tylko wtedy, gdy można ją zweryfikować w boj
 Obecnie, w celu zachowania przejrzystości projektu i ułatwienia nawigacji, proces **Detection Engineering** dla kolejnych przypadków przenoszę do osobnych, dedykowanych plików. Każdy z nich stanowi kompletny cykl: od zainicjowania symulowanego zagrożenia, przez analizę telemetrii, aż po weryfikację logiki detekcji.
 
 
+---
+
 
 ## Case Study 1: SMB Reconnaissance & Brute-Force
 
