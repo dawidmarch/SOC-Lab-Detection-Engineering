@@ -26,7 +26,7 @@ Atak rozpoczęto od nawiązania zdalnej sesji z wykorzystaniem `impacket-psexec`
 ### Credential Dumping
 Po uzyskaniu uprawnień `SYSTEM`, wykonano polecenie `sekurlsa::logonpasswords` w procesie `mimikatz.exe`. Proces ten otworzył uchwyt (handle) do `lsass.exe` w celu odczytu pamięci zawierającej hashe NTLM oraz bilety Kerberos.
 
-## 4. Analiza logów (Wazuh/Sysmon)
+## 4. Analiza logów 
 Monitorowanie procesów przez Sysmon (Event ID 10) pozwoliło na rejestrację krytycznego zdarzenia.
 
 <img width="1499" height="841" alt="mimikatzexe" src="https://github.com/user-attachments/assets/aefc0682-df76-4f6d-afb9-d149f078b65c" />
