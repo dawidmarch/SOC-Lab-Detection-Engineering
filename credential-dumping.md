@@ -40,6 +40,7 @@ Monitorowanie procesów przez Sysmon (Event ID 10) pozwoliło na rejestrację kr
   "win.eventdata.sourceImage": "C:\\Temp\\x64\\mimikatz.exe",
   "win.eventdata.grantedAccess": "0x1010"
 }
+```
 
 ## 5. Wnioski techniczne
 * **Dlaczego nie było logu "Process Create" dla wmiprvse.exe?** 
