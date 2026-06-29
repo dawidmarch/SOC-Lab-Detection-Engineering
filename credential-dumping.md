@@ -20,7 +20,7 @@ Celem projektu było przeprowadzenie symulowanego ataku typu "credential dumping
 Atak rozpoczęto od nawiązania zdalnej sesji z wykorzystaniem `impacket-psexec`. Narzędzie to wykorzystuje protokół SMB do wgrania usługi serwisowej, co pozwoliło na uzyskanie powłoki z uprawnieniami `SYSTEM`.
 * **Komenda:**
   ```bash
-  impacket-psexec ./Administrator:Haslo123!@10.0.2.4
+   `impacket-psexec './Administrator:Haslo123!@10.0.2.4' `
  
 * **Cel:** Utworzenie katalogu roboczego dla plików narzędziowych.
   
