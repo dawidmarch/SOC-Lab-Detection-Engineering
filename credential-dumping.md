@@ -40,3 +40,17 @@ Monitorowanie procesów przez Sysmon (Event ID 10) pozwoliło na rejestrację kr
   "win.eventdata.sourceImage": "C:\\Temp\\x64\\mimikatz.exe",
   "win.eventdata.grantedAccess": "0x1010"
 }
+
+## 5. Wnioski techniczne
+* **Dlaczego nie było logu "Process Create" dla wmiprvse.exe?** 
+  Usługa `wmiprvse.exe` jest usługą systemową działającą w tle. W momencie ataku nie powstaje nowy proces `wmiprvse.exe`, lecz uruchamia on proces potomny (`cmd.exe`). Sysmon poprawnie zalogował proces potomny, co pozwoliło na identyfikację podejrzanej ścieżki w `parentCommandLine`.
+* **Wskaźnik ataku:** Obecność udziału `ADMIN$` oraz unikalnej struktury polecenia w `parentCommandLine` jest wysoce niestandardowa i stanowi silny wskaźnik użycia techniki `WMIExec`.
+
+## 6. Rekomendacja 
+Aby wykryć ten atak w przyszłości, zaleca się implementację reguły w Wazuh:
+```xml
+<rule id="100002" level="12">
+  <if_sid>61603</if_sid>
+  <field name="data.win.eventdata.parentCommandLine">.*ADMIN\\$.*</field>
+  <description>Lateral Movement - WMIExec Detected</description>
+</rule>
