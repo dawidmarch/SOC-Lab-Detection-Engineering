@@ -25,15 +25,6 @@ Całe laboratorium zostało uruchomione lokalnie na moim fizycznym komputerze. O
 
 
 
-## Scenarios & Detection Analysis
-Poniżej znajdziesz szczegółową analizę przeprowadzonych ataków i detekcji:
-
-* [Lateral Movement - WMIExec](lateral-movement.md)
-
-
-
-
-
 ## Validation & Practical Application
 
 Wierzę, że teoria ma wartość tylko wtedy, gdy można ją zweryfikować w boju. Początkowo wdrożyłem **7 case studies** bezpośrednio w tym pliku, aby szybko przetestować środowisko i upewnić się, że mechanizmy detekcji działają zgodnie z założeniami.
