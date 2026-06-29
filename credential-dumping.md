@@ -18,6 +18,10 @@ Celem projektu było przeprowadzenie symulowanego ataku typu "credential dumping
 
 ### Lateral Movement (PsExec)
 Atak rozpoczęto od nawiązania zdalnej sesji z wykorzystaniem `impacket-psexec`. Narzędzie to wykorzystuje protokół SMB do wgrania usługi serwisowej, co pozwoliło na uzyskanie powłoki z uprawnieniami `SYSTEM`.
+**Komenda:**
+  ```bash
+  impacket-psexec ./Administrator:Haslo123!@10.0.2.4
+ ```
 
 <img width="749" height="455" alt="kali" src="https://github.com/user-attachments/assets/f7ae3f03-d750-46c2-935c-1f50dbfcfb7a" />
 
