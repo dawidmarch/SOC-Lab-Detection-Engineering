@@ -9,14 +9,18 @@ Wykorzystano narzędzie `impacket-wmiexec` do zdalnego wykonania kodu na hoście
 * **Komenda:** `impacket-wmiexec './Administrator:Haslo123!@10.0.2.4'`
 * **Cel:** Uzyskanie zdalnej powłoki (shell) poprzez usługi WMI.
 
+<img width="765" height="423" alt="Kali" src="https://github.com/user-attachments/assets/4843a381-7473-4b9b-bad4-7a0fdecb0b3f" />
+
 ## 3. Analiza logów (Threat Hunting)
 Po wykonaniu ataku, przeprowadzono analizę logów w platformie Wazuh. Zidentyfikowano zdarzenie `Event ID 1` (Process Create), które jest kluczowe dla wykrycia tego ataku.
 
 ### Znalezione dowody (Smoking Gun):
-Analiza pliku JSON z logu `whoami.exe` wykazała następujące parametry:
+Analiza pliku JSON z logu `whoami.exe` (zgodnie z załączonym **image_be7d42.jpg**) wykazała następujące parametry:
 - **Proces:** `whoami.exe`
 - **Rodzic (ParentImage):** `C:\Windows\System32\cmd.exe`
 - **ParentCommandLine:** `cmd.exe /Q /c whoami 1> \\127.0.0.1\ADMIN$\__1782736377.295496 2>&1`
+
+<img width="1505" height="843" alt="Wazuh" src="https://github.com/user-attachments/assets/8fad5906-0cea-4c95-b3ee-516e61db27df" />
 
 ## 4. Wnioski techniczne
 * **Dlaczego nie było logu "Process Create" dla wmiprvse.exe?** 
