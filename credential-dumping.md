@@ -21,8 +21,7 @@ Atak rozpoczęto od nawiązania zdalnej sesji z wykorzystaniem `impacket-psexec`
 * **Komenda:**
   ```bash
   impacket-psexec ./Administrator:Haslo123!@10.0.2.4
- ```
-```
+ 
 * **Cel:** Utworzenie katalogu roboczego dla plików narzędziowych.
   
 <img width="749" height="455" alt="kali" src="https://github.com/user-attachments/assets/f7ae3f03-d750-46c2-935c-1f50dbfcfb7a" />
