@@ -4,7 +4,7 @@ Projekt stworzyłem w celu praktycznego przetestowania mechanizmów detekcji zag
 
 
 
-## Hardware & Host OS (Platforma sprzętowa)
+## Hardware & Host OS 
 Całe laboratorium zostało uruchomione lokalnie na moim fizycznym komputerze. Odpowiednie alokowanie zasobów było kluczowe, aby zapewnić stabilną pracę menedżera SIEM (Wazuh) przy jednoczesnym działaniu maszyn klienckich. Duży zapas pamięci RAM (32 GB) pozwolił na bezproblemowe i płynne działanie całej topologii bez konieczności agresywnego przycinania pamięci dla maszyn wirtualnych.
 
 * **System operacyjny hosta:** Windows 10 Pro (64-bit)
@@ -14,7 +14,7 @@ Całe laboratorium zostało uruchomione lokalnie na moim fizycznym komputerze. O
 
 
 
-## Oprogramowanie i Wirtualizacja (Software Stack)
+## Software Stack
 * **Hiperwzorzec:** Oracle VirtualBox (wersja 7.2.10) – posłużył do stworzenia izolowanej sieci typu Host-Only (`10.0.2.0/24`), całkowicie bezpiecznej dla systemu operacyjnego hosta.
 * **SIEM / XDR:** Wazuh Manager (Virtual Appliance oparty na Ubuntu) – `10.0.2.3` (Centralny punkt zbierania i analizy logów).
 * **Endpoint (Ofiara):** Windows 10 Pro – `10.0.2.4` (Zainstalowany agent Wazuh oraz sensor Microsoft Sysmon z konfiguracją SwiftOnSecurity).
