@@ -25,6 +25,14 @@ Całe laboratorium zostało uruchomione lokalnie na moim fizycznym komputerze. O
 ---
 
 
+### Validation & Practical Application
+
+Wierzę, że teoria ma wartość tylko wtedy, gdy można ją zweryfikować w boju. Początkowo wdrożyłem **7 case studies** bezpośrednio w tym pliku, aby szybko przetestować środowisko i upewnić się, że mechanizmy detekcji działają zgodnie z założeniami.
+
+Obecnie, w celu zachowania przejrzystości projektu i ułatwienia nawigacji, proces **Detection Engineering** dla kolejnych przypadków przenoszę do osobnych, dedykowanych plików. Każdy z nich stanowi kompletny cykl: od zainicjowania symulowanego zagrożenia, przez analizę telemetrii, aż po weryfikację logiki detekcji.
+
+
+
 ## Case Study 1: SMB Reconnaissance & Brute-Force
 
 ### 1. Przebieg ataku 
