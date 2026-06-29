@@ -14,6 +14,8 @@ Celem projektu było przeprowadzenie symulowanego ataku typu "credential dumping
 | :--- | :--- | :--- | :--- |
 | Credential Access | OS Credential Dumping | T1003.001 | Uzyskanie dostępu do pamięci LSASS w celu ekstrakcji poświadczeń. |
 
+**T1003.001:** Uzyskanie dostępu do pamięci procesu `lsass.exe` w celu ekstrakcji poświadczeń (hashy/haseł).
+
 ## 3. Metodologia ataku
 
 ### Lateral Movement (PsExec)
