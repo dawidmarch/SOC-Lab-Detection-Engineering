@@ -41,7 +41,7 @@ ftp 10.0.2.5
 
 3. Wprowadziłem poświadczenia (w celach symulacji):
    - User: anonymous
-   - Password: [hasło_testowe]
+   - Password: password
 
 ## 4. Moja analiza ruchu sieciowego (Wireshark)
 Po przechwyceniu ruchu, poddałem plik `capture.pcap` analizie za pomocą narzędzia Wireshark.
