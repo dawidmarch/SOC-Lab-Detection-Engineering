@@ -23,11 +23,10 @@ Na mojej maszynie atakującego uruchomiłem serwer FTP oraz zainicjowałem przec
 sudo apt install vsftpd -y
 sudo systemctl start vsftpd
 
-<img width="715" height="483" alt="kali" src="https://github.com/user-attachments/assets/6dceb8f7-c8cb-42a1-b6df-af3bc3ef63b7" />
-
 # Przechwytywanie ruchu na porcie 21 do pliku .pcap
 sudo tcpdump -i eth0 port 21 -w capture.pcap
 ```
+<img width="715" height="483" alt="kali" src="https://github.com/user-attachments/assets/6dceb8f7-c8cb-42a1-b6df-af3bc3ef63b7" />
 
 ### Faza B: Generowanie ruchu (Windows 10 - Ofiara)
 Z poziomu drugiego systemu (Windows 10) zainicjowałem sesję FTP, generując ruch sieciowy zawierający poświadczenia.
