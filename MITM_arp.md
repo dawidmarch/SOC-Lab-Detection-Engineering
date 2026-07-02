@@ -49,8 +49,6 @@ Po przechwyceniu ruchu, dokonano analizy strumienia TCP (`Follow HTTP Stream`).
 2.  **Podatność na sniffery:** Wdrożenie techniki MITM pozwala na pełną pasywną analizę ruchu, jeśli protokoły warstwy aplikacji (HTTP) nie wspierają szyfrowania (TLS/SSL).
 3.  **Skuteczność filtrów Wireshark:** Zastosowanie filtra `http.request.method==GET` pozwoliło na błyskawiczne wyodrębnienie interesujących danych z szumu sieciowego (tysięcy pakietów ARP).
 
----
-
 ## 6. Rekomendacja
 
 * **Wdrożenie HTTPS:** Wymuszenie protokołu TLS dla wszystkich usług webowych. Nawet w przypadku udanego ataku MITM, napastnik przechwyci jedynie zaszyfrowany ciąg znaków, uniemożliwiając odczytanie treści (np. haseł czy ciasteczek sesyjnych).
