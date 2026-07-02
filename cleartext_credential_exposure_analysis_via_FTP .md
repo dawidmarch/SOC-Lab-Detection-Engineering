@@ -52,7 +52,7 @@ Po przechwyceniu ruchu, poddałem plik `capture.pcap` analizie za pomocą narzę
 - **Otwarcie pliku:** Otworzyłem plik `capture.pcap` i zastosowałem filtr `ftp`.
 - **Analiza strumienia:** Użyłem funkcji *Follow -> TCP Stream*, która pozwoliła mi na rekonstrukcję pełnej sesji komunikacyjnej między klientem (Windows) a serwerem (Kali).
 - **Wynik:** W warstwie aplikacji protokołu FTP zidentyfikowałem pakiety typu `USER` oraz `PASS`, w których poświadczenia były dla mnie widoczne w postaci czystego tekstu (cleartext). Potwierdziło to skuteczność przeprowadzonego przeze mnie pasywnego podsłuchu.
-
+- 
 ## 5. Wnioski techniczne 
 - **Krytyczność:** Podczas moich testów potwierdziłem, że wykorzystanie protokołów typu "legacy" (FTP, Telnet) stanowi poważne zagrożenie. Brak szyfrowania w warstwie transportowej (TLS/SSL) sprawia, że każda próba uwierzytelnienia może zostać przechwycona przez stronę trzecią z dostępem do medium transmisyjnego.
 - **Widoczność:** Ruch sieciowy w segmencie lokalnym (L2/L3) jest kluczowym elementem analizy śledczej. W przypadku braku logów EDR/SIEM, przeprowadzona przeze mnie analiza pliku PCAP okazała się jedynym wiarygodnym źródłem prawdy o działaniach w sieci.
