@@ -2,17 +2,12 @@
 
 Projekt stworzyłem w celu praktycznego przetestowania mechanizmów detekcji zagrożeń w odizolowanym środowisku sieciowym. Skupiłem się na analizie telemetrii systemowej, korelacji logów w systemie SIEM oraz inspekcji surowych pakietów sieciowych. Całość opiera się na symulacji realnych technik hakerskich i mapowaniu ich do matrycy MITRE ATT&CK.
 
-
-
 ## Hardware & Host OS 
-Całe laboratorium zostało uruchomione lokalnie na moim fizycznym komputerze. Odpowiednie alokowanie zasobów było kluczowe, aby zapewnić stabilną pracę menedżera SIEM (Wazuh) przy jednoczesnym działaniu maszyn klienckich. Duży zapas pamięci RAM (32 GB) pozwolił na bezproblemowe i płynne działanie całej topologii bez konieczności agresywnego przycinania pamięci dla maszyn wirtualnych.
 
 * **System operacyjny hosta:** Windows 10 Pro (64-bit)
 * **Procesor (CPU):** Intel(R) Core(TM) i7-2600 CPU @ 3.40GHz
 * **Pamięć RAM:** 32,0 GB
 * **Dysk:** SSD Patriot P210 512GB
-
-
 
 ## Software Stack
 * **Hiperwzorzec:** Oracle VirtualBox (wersja 7.2.10) – posłużył do stworzenia izolowanej sieci typu Host-Only (`10.0.2.0/24`), całkowicie bezpiecznej dla systemu operacyjnego hosta.
@@ -21,19 +16,11 @@ Całe laboratorium zostało uruchomione lokalnie na moim fizycznym komputerze. O
 * **System Atakującego:** Kali Linux – `10.0.2.5` (Platforma do generowania ruchu i symulacji ataków).
 * **Analiza Sieciowa:** Wireshark – narzędzie do przechwytywania i analizy surowych pakietów (PCAP).
 
-
-
-
-
 ## Validation & Practical Application
 
 Wierzę, że teoria ma wartość tylko wtedy, gdy można ją zweryfikować w boju. Początkowo wdrożyłem **7 case studies** bezpośrednio w tym pliku, aby szybko przetestować środowisko i upewnić się, że mechanizmy detekcji działają zgodnie z założeniami.
 
 Obecnie, w celu zachowania przejrzystości projektu i ułatwienia nawigacji, proces **Detection Engineering** dla kolejnych przypadków przenoszę do osobnych, dedykowanych plików. Każdy z nich stanowi kompletny cykl: od zainicjowania symulowanego zagrożenia, przez analizę telemetrii, aż po weryfikację logiki detekcji.
-
-
-
-
 
 ## Case Study 1: SMB Reconnaissance & Brute-Force
 
@@ -63,7 +50,6 @@ Agent Wazuh pomyślnie przechwycił i przesłał do bazy log dotyczący nieudane
 
 <img width="719" height="785" alt="wazuh-alert-4625" src="https://github.com/user-attachments/assets/c0955a8e-d576-4d74-b24a-acadb512e29d" />
 
-
 *Wnioski z wdrożenia:* Podczas pierwszej próby Windows Defender Firewall całkowicie dropował pakiety sieciowe, przez co system nie generował logów audytowych. Dopiero po odpowiedniej rekonfiguracji profili zapory sieciowej telemetria zaczęła poprawnie spływać do SIEM-a.
 
 #### Analiza ruchu sieciowego: Wireshark PCAP
@@ -72,10 +58,6 @@ Równolegle z analizą logów systemowych, zweryfikowałem ruch na poziomie paki
 <img width="1440" height="255" alt="wireshark-smb-attack" src="https://github.com/user-attachments/assets/f620a488-3b25-4872-b09a-47d685ab6f1d" />
 
 Filtrowanie protokołu `smb` wykazało sekwencję pakietów negocjacji sesji, która zakończyła się jednoznacznym komunikatem ze strony serwera Windows: `STATUS_LOGON_FAILURE`. To bezpośredni, sieciowy dowód korelujący z Event ID 4625 z logów hosta.
-
-
-
-
 
 ## Case Study 2: PowerShell Reverse Shell & Execution Detection
 
@@ -101,12 +83,7 @@ Podczas testów napotkałem mechanizm ochronny Windows Defender (AMSI), który b
 <img width="1483" height="291" alt="wazuh-sysmon-event1-powershell-execution_1" src="https://github.com/user-attachments/assets/021baabe-b189-4b69-9778-ea40466a132e" />
 <img width="1489" height="183" alt="wazuh-sysmon-event1-powershell-execution_2" src="https://github.com/user-attachments/assets/c23123e9-d5b3-4b68-ae15-314b4848b337" />
 
-
 *Analiza mechanizmu Sysmon:* Wklejenie złośliwego kodu bezpośrednio do otwartej wcześniej konsoli PowerShell nie generuje nowego Event ID 1 (ponieważ nie powstaje nowy proces, kod wykonuje się wewnątrz istniejącego PID). Aby poprawnie udokumentować to zdarzenie w SIEM, wywołałem skrypt z poziomu klasycznego Wiersza poleceń (`cmd.exe`), wymuszając flagę `-Command`. Dzięki temu pole `data.win.eventdata.commandLine` w pełni ujawniło cały złośliwy payload sieciowy wraz z zakodowanym adresem IP atakującego.
-
-
-
- 
 
 ## Case Study 3: Scheduled Task Persistence & Execution Detection
 
@@ -117,7 +94,7 @@ To zadanie stanowi bezpośrednią kontynuację działań poeksploatacyjnych. Wyk
     ```cmd
     schtasks /create /tn "WindowsMaliciousUpdate" /tr "powershell.exe -nop -w hidden -c Get-Process" /sc minute /mo 5 /ru "SYSTEM"
     ```
-
+    
 ### 2. Mapowanie do MITRE ATT&CK
 * **Taktyka:** Persistence ([TA0003](https://attack.mitre.org/tactics/TA0003/)) $\rightarrow$ **Technika:** Scheduled Task/Job: Scheduled Task ([T1053.005](https://attack.mitre.org/techniques/T1053/005/))
 
@@ -134,11 +111,7 @@ Sensor Sysmon zarejestrował zdarzenie jako utworzenie nowego procesu przez syst
 
   <img width="925" height="675" alt="wazuh-persistence-execution" src="https://github.com/user-attachments/assets/a226a2bb-48a1-4645-b478-c9bd731bf7bf" />
 
-
 *Wnioski z analizy:* Uruchomienie konsoli PowerShell bezpośrednio przez proces `svchost.exe` (Schedule) w kontekście konta `SYSTEM` to podręcznikowy wskaźnik anomalii procesowej. W realnym środowisku produkcyjnym taki schemat zachowania natychmiast kwalifikuje hosta do pełnej izolacji sieciowej, ponieważ potwierdza udane złośliwe zagnieżdżenie się w systemie i eskalację uprawnień.
-
-
-
 
 ## Case Study 4: TCP SYN Stealth Scan & Packet Inspection (Wireshark Forensics)
 
@@ -165,7 +138,6 @@ Filtrowanie ruchu za pomocą reguły `ip.addr == 10.0.2.4 and tcp` ujawniło pow
 3. **`Kali -> Windows [RST]`**: Zamiast wysłania standardowego pakietu `ACK` kończącego klasyczny proces *TCP Three-Way Handshake*, maszyna atakująca natychmiach wysyła flagę **RST (Reset)**, brutalnie przerywając sesję.
 
 <img width="1585" height="441" alt="wireshark-syn-scan" src="https://github.com/user-attachments/assets/661a5cb0-d477-4985-833e-791b6b1ecd91" />
-
 
 *Wnioski z analizy:* Masowe pojawianie się pakietów `RST` bezpośrednio po otrzymaniu odpowiedzi `SYN-ACK` z danego adresu IP to jednoznaczny, sieciowy wskaźnik intruzji (IoC) wskazujący na zautomatyzowane skanowanie środowiska. W systemach klasy Network Detection and Response (NDR) lub na zaporach sieciowych, wykrycie takiej sekwencji z jednego źródła w krótkim oknie czasowym automatycznie wyzwala regułę progową i skutkuje natychmiastowym zablokowaniem IP napastnika.
 
