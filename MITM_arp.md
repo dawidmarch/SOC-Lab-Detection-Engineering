@@ -26,7 +26,7 @@ Celem projektu było przeprowadzenie kontrolowanego ataku typu Man-in-the-Middle
 
 <img width="1121" height="833" alt="wireshark" src="https://github.com/user-attachments/assets/6abc87a3-f3cd-44e0-bc37-367633309f29" />
 
-4.  **Analiza danych:** Wyszukano żądania HTTP, korzystając z filtra `http.request.method==GET`, aby wyizolować ruch aplikacyjny.
+3.  **Analiza danych:** Wyszukano żądania HTTP, korzystając z filtra `http.request.method==GET`, aby wyizolować ruch aplikacyjny.
 
  <img width="1011" height="831" alt="wireshark 1" src="https://github.com/user-attachments/assets/88b958be-ea95-4b34-8143-fe7c769e31c4" />
 
