@@ -3,8 +3,6 @@
 ## 1. Cel projektu
 Celem projektu jest symulacja ataku typu Remote Code Execution (RCE) na serwerze XAMPP zainstalowanym na systemie Windows 10. Projekt ma na celu zweryfikowanie skuteczności monitorowania procesów potomnych serwera WWW (Apache) za pomocą Sysmon i ich analizę w systemie Wazuh.
 
-
-
 ## 2. MITRE ATT&CK Mapowanie
 
 | Takt | ID Techniki | Nazwa Techniki | Opis |
@@ -12,8 +10,6 @@ Celem projektu jest symulacja ataku typu Remote Code Execution (RCE) na serwerze
 | **Initial Access** | T1190 | Exploit Public-Facing Application | Wykorzystanie luki w aplikacji webowej (upload shella). |
 | **Execution** | T1059.003 | Command and Scripting Interpreter | Wykonanie komend systemowych przez proces `cmd.exe`. |
 | **Persistence** | T1505.003 | Server Software Component: Web Shell | Utrzymanie dostępu poprzez wgrany skrypt `.php`. |
-
-
 
 ## 3. Metodologia ataku
 
@@ -38,8 +34,6 @@ Uruchomienie komendy systemowej przez HTTP.
 
   <img width="718" height="293" alt="curl" src="https://github.com/user-attachments/assets/e0b2b8cc-da72-45a8-be5f-e56c79d19ae0" />
 
-
-
 ## 4. Analiza logów (Wazuh/Sysmon)
 Po ataku, system Wazuh rejestruje zdarzenie utworzenia procesu (Sysmon Event ID 1). W analizie JSON należy skupić się na polach:
 
@@ -50,15 +44,11 @@ Po ataku, system Wazuh rejestruje zdarzenie utworzenia procesu (Sysmon Event ID 
 
 **Wniosek:** Każde zdarzenie, w którym Apache uruchamia proces `cmd.exe` lub `powershell.exe`, jest uznawane za wysokie ryzyko naruszenia bezpieczeństwa.
 
-
-
 ## 5. Wnioski techniczne 
 Z perspektywy analityka, kluczową obserwacją jest **łańcuch procesów (Parent-Child process lineage)**. 
 * Serwer Apache działa jako usługa systemowa. Jeśli proces potomny wykazuje cechy interaktywnego shella, mamy do czynienia z naruszeniem integralności aplikacji.
 * **Zagrożenie:** Jeśli nie wykryjemy `cmd.exe` na wczesnym etapie, atakujący może przejść do fazy eskalacji uprawnień lub pobrania dodatkowego malware (np. Cobalt Strike beacon).
 * **Detekcja:** Monitoring samego pliku `shell.php` jest niewystarczający; skuteczna detekcja opiera się na analizie zachowania procesów potomnych.
-
-
 
 ## 6. Rekomendacja (Reguła detekcji w XML)
 Poniższa reguła dla Wazuh Manager wykrywa nieautoryzowane wywołanie interpretera poleceń przez proces Apache.
